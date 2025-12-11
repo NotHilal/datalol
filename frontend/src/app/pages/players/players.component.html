@@ -1,0 +1,227 @@
+<div class="players-page">
+  <div class="page-header">
+    <h1>Players Leaderboard</h1>
+    <p class="subtitle">{{ totalPlayers | number }} ranked players</p>
+  </div>
+
+  <!-- Sort Controls -->
+  <div class="sort-controls" *ngIf="!initialLoad">
+    <label>Sort by:</label>
+    <div class="sort-buttons">
+      <button
+        class="sort-btn"
+        [class.active]="sortBy === 'rank'"
+        (click)="changeSorting('rank')">
+        <span>Rank</span>
+      </button>
+      <button
+        class="sort-btn"
+        [class.active]="sortBy === 'lp'"
+        (click)="changeSorting('lp')">
+        <span>LP</span>
+      </button>
+      <button
+        class="sort-btn"
+        [class.active]="sortBy === 'games'"
+        (click)="changeSorting('games')">
+        <span>Games</span>
+      </button>
+      <button
+        class="sort-btn"
+        [class.active]="sortBy === 'winrate'"
+        (click)="changeSorting('winrate')">
+        <span>Win Rate</span>
+      </button>
+      <button
+        class="sort-btn"
+        [class.active]="sortBy === 'wins'"
+        (click)="changeSorting('wins')">
+        <span>Wins</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Tier Filter Toggle -->
+  <div class="filter-toggle-container">
+    <button class="filter-toggle-btn" (click)="showFilters = !showFilters">
+      <span class="icon">{{ showFilters ? '▼' : '▶' }}</span>
+      <span>{{ showFilters ? 'Hide Filters' : 'Show Filters' }}</span>
+      <span class="active-count" *ngIf="selectedTiers.length > 0">({{ selectedTiers.length }})</span>
+    </button>
+
+    <div class="tier-filter" *ngIf="showFilters" [@slideDown]>
+      <div class="filter-content">
+        <label class="filter-label">Filter by Tier:</label>
+        <div class="tier-checkboxes">
+          <label class="checkbox-item" *ngFor="let tier of availableTiers">
+            <input
+              type="checkbox"
+              [checked]="selectedTiers.includes(tier)"
+              (change)="toggleTier(tier)">
+            <span class="tier-name" [ngClass]="tier.toLowerCase()">{{ tier }}</span>
+          </label>
+        </div>
+        <div class="clear-filter-container">
+          <button class="clear-filter-btn" (click)="clearFilters()" [class.visible]="selectedTiers.length > 0">
+            Clear Filters
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="initialLoad" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading players...</p>
+  </div>
+
+  <div *ngIf="!initialLoad" class="players-content">
+    <div class="players-table">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Rank</th>
+            <th>LP</th>
+            <th>Wins</th>
+            <th>Losses</th>
+            <th>Win Rate</th>
+            <th>Games</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let player of players; let i = index" class="player-row" (click)="viewPlayerDetail(player.puuid)" [style.cursor]="'pointer'">
+            <td class="rank-number">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+            <td class="tier-cell">
+              <div class="tier-badge" [ngClass]="getTierClass(player.tier)">
+                <span class="tier-name">{{ player.tier }}</span>
+                <span class="rank-name" *ngIf="player.tier !== 'MASTER' && player.tier !== 'CHALLENGER' && player.tier !== 'GRANDMASTER'">{{ player.rank }}</span>
+              </div>
+            </td>
+            <td class="lp-cell">
+              <span class="lp-value">{{ player.leaguePoints }}</span>
+            </td>
+            <td class="wins-cell">{{ player.wins }}</td>
+            <td class="losses-cell">{{ player.losses }}</td>
+            <td class="winrate-cell">
+              <div class="winrate-bar">
+                <span class="winrate-text" [ngClass]="getWinRateClass(getWinRate(player))">
+                  {{ getWinRate(player) }}%
+                </span>
+                <div class="progress-bar">
+                  <div class="progress-fill" [style.width.%]="getWinRate(player)"></div>
+                </div>
+              </div>
+            </td>
+            <td class="games-cell">{{ player.wins + player.losses }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div *ngIf="players.length === 0" class="no-data">
+        No players found
+      </div>
+    </div>
+
+    <app-pagination
+      *ngIf="players.length > 0"
+      [currentPage]="currentPage"
+      [totalPages]="totalPages"
+      [pageSize]="pageSize"
+      [totalItems]="totalPlayers"
+      (pageChange)="onPageChange($event)">
+    </app-pagination>
+  </div>
+
+  <!-- Player Detail Modal -->
+  <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 *ngIf="selectedPlayerInfo">{{ selectedPlayerInfo.name || 'Player Details' }}</h2>
+        <h2 *ngIf="!selectedPlayerInfo">Player Details</h2>
+        <button class="close-btn" (click)="closeModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div *ngIf="modalLoading" class="modal-loading">
+          <div class="spinner"></div>
+          <p>Loading player statistics...</p>
+        </div>
+
+        <div *ngIf="!modalLoading && selectedPlayerInfo" class="player-modal-content">
+          <!-- Player Info Section -->
+          <div class="player-info-section">
+            <div class="info-card">
+              <div class="info-label">Rank</div>
+              <div class="tier-badge" [ngClass]="getTierClass(selectedPlayerInfo.tier)">
+                <span class="tier-name">{{ selectedPlayerInfo.tier }}</span>
+                <span class="rank-name" *ngIf="selectedPlayerInfo.tier !== 'MASTER' && selectedPlayerInfo.tier !== 'CHALLENGER' && selectedPlayerInfo.tier !== 'GRANDMASTER'">{{ selectedPlayerInfo.rank }}</span>
+              </div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">League Points</div>
+              <div class="info-value lp">{{ selectedPlayerInfo.leaguePoints }}</div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">Wins</div>
+              <div class="info-value wins">{{ selectedPlayerInfo.wins }}</div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">Losses</div>
+              <div class="info-value losses">{{ selectedPlayerInfo.losses }}</div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">Win Rate</div>
+              <div class="info-value" [ngClass]="'winrate-' + getWinRateClass(getWinRate(selectedPlayerInfo))">
+                {{ getWinRate(selectedPlayerInfo) }}%
+              </div>
+            </div>
+          </div>
+
+          <!-- Player Statistics Section -->
+          <div *ngIf="selectedPlayerStats" class="player-stats-section">
+            <h3>Match Statistics</h3>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-label">Total Matches</div>
+                <div class="stat-value">{{ selectedPlayerStats.totalGames }}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Average KDA</div>
+                <div class="stat-value">{{ selectedPlayerStats.avgKDA }}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Average Kills</div>
+                <div class="stat-value">{{ selectedPlayerStats.avgKills }}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Average Deaths</div>
+                <div class="stat-value">{{ selectedPlayerStats.avgDeaths }}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Average Assists</div>
+                <div class="stat-value">{{ selectedPlayerStats.avgAssists }}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Avg Gold Earned</div>
+                <div class="stat-value">{{ selectedPlayerStats.avgGold | number }}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Avg Damage Dealt</div>
+                <div class="stat-value">{{ selectedPlayerStats.avgDamage | number }}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Avg CS</div>
+                <div class="stat-value">{{ selectedPlayerStats.avgCS }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="!selectedPlayerStats && !modalLoading" class="no-stats">
+            No match statistics available for this player.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

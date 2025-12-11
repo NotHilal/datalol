@@ -1,0 +1,72 @@
+.player-detail-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.page-header {
+  margin-bottom: 30px;
+
+  .back-btn {
+    background: #2a2d31;
+    border: 1px solid #3c3c41;
+    color: #f0e6d2;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    transition: all 0.2s;
+
+    &:hover {
+      background: #3c3c41;
+      transform: translateX(-4px);
+    }
+  }
+
+  h1 {
+    font-size: 36px;
+    color: #f0e6d2;
+    margin: 0;
+    font-weight: 700;
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  color: #a09b8c;
+
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #3c3c41;
+    border-top-color: #0097e6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-message {
+  text-align: center;
+  padding: 80px 20px;
+
+  h2 {
+    color: #f0e6d2;
+    margin: 0 0 16px 0;
+  }
+
+  p {
+    color: #a09b8c;
+    margin: 0 0 24px 0;
+  }
+}

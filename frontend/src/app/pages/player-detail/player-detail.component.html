@@ -1,0 +1,21 @@
+<div class="player-detail-page">
+  <div class="page-header">
+    <button class="back-btn" (click)="goBack()">← Back to Players</button>
+    <h1>Player Statistics</h1>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading player statistics...</p>
+  </div>
+
+  <div *ngIf="!loading && playerStats" class="player-content">
+    <app-player-stats [stats]="playerStats"></app-player-stats>
+  </div>
+
+  <div *ngIf="!loading && !playerStats" class="error-message">
+    <h2>Player not found</h2>
+    <p>No statistics found for player "{{ playerName }}"</p>
+    <button class="back-btn" (click)="goBack()">← Back to Players</button>
+  </div>
+</div>

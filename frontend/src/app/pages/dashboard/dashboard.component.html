@@ -1,0 +1,118 @@
+<div class="dashboard">
+  <div class="dashboard-header">
+    <h1>Dashboard</h1>
+    <p class="subtitle">League of Legends Match Analytics Overview</p>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading dashboard data...</p>
+  </div>
+
+  <div *ngIf="!loading" class="dashboard-content">
+    <!-- Stats Overview Cards -->
+    <div class="stats-overview">
+      <div class="stat-card">
+        <div class="stat-icon">🎮</div>
+        <div class="stat-info">
+          <div class="stat-label">Total Matches</div>
+          <div class="stat-value">{{ totalMatches | number }}</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">⏱️</div>
+        <div class="stat-info">
+          <div class="stat-label">Avg Duration</div>
+          <div class="stat-value">{{ avgGameDuration }}</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-info">
+          <div class="stat-label">Top Champion</div>
+          <div class="stat-value champion-name">{{ topChampion }}</div>
+          <div class="stat-detail">{{ topChampionWinRate | number:'1.1-1' }}% WR</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-info">
+          <div class="stat-label">Champions Analyzed</div>
+          <div class="stat-value">{{ championStats.length }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+      <div class="chart-row">
+        <div class="chart-card">
+          <h3>Team Side Win Rates</h3>
+          <app-chart
+            *ngIf="teamSideChartData"
+            [type]="'bar'"
+            [data]="teamSideChartData"
+            [options]="{scales: {y: {beginAtZero: true, max: 60}}}">
+          </app-chart>
+        </div>
+
+        <div class="chart-card">
+          <h3>Top 10 Champions - Win Rate</h3>
+          <app-chart
+            *ngIf="winRateChartData"
+            [type]="'bar'"
+            [data]="winRateChartData"
+            [options]="{scales: {y: {beginAtZero: true, max: 100}}}">
+          </app-chart>
+        </div>
+      </div>
+
+      <div class="chart-row">
+        <div class="chart-card full-width">
+          <h3>Champion Performance - Games & Wins</h3>
+          <app-chart
+            *ngIf="championChartData"
+            [type]="'bar'"
+            [data]="championChartData">
+          </app-chart>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Matches -->
+    <div class="recent-section">
+      <div class="section-header">
+        <h2>Recent Matches</h2>
+        <a routerLink="/matches" class="view-all-link">View All →</a>
+      </div>
+      <div class="matches-grid">
+        <app-match-card
+          *ngFor="let match of recentMatches"
+          [match]="match">
+        </app-match-card>
+        <div *ngIf="recentMatches.length === 0" class="no-data">
+          No recent matches found
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="quick-links">
+      <a routerLink="/matches" class="quick-link">
+        <span class="link-icon">🎮</span>
+        <span class="link-text">Browse All Matches</span>
+      </a>
+      <a routerLink="/players" class="quick-link">
+        <span class="link-icon">👥</span>
+        <span class="link-text">View Players</span>
+      </a>
+      <a routerLink="/statistics" class="quick-link">
+        <span class="link-icon">📊</span>
+        <span class="link-text">Detailed Statistics</span>
+      </a>
+    </div>
+  </div>
+</div>

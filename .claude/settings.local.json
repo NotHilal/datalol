@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python restore_players_backup.py:*)",
+      "Bash(cat:*)",
+      "Bash(python:*)",
+      "Bash(dir:*)",
+      "Bash(pip install:*)",
+      "Bash(timeout /t 30 /nobreak)",
+      "Bash(echo:*)",
+      "Bash(curl:*)",
+      "Bash(timeout 300 python:*)",
+      "Bash(timeout 600 python:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(rm:*)",
+      "Bash(git commit:*)",
+      "Bash(git branch:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)",
+      "Bash(git rm:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

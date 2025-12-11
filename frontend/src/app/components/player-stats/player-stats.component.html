@@ -1,0 +1,94 @@
+<div class="player-stats" *ngIf="stats">
+  <div class="stats-header">
+    <h3>{{ stats.playerName }}</h3>
+    <div class="games-count">{{ stats.totalGames }} Games</div>
+  </div>
+
+  <div class="stats-grid">
+    <!-- Win Rate -->
+    <div class="stat-card primary">
+      <div class="stat-icon">🏆</div>
+      <div class="stat-content">
+        <div class="stat-label">Win Rate</div>
+        <div class="stat-value" [style.color]="getWinRateColor()">
+          {{ stats.winRate | number:'1.1-1' }}%
+        </div>
+        <div class="stat-detail">{{ stats.wins }}W / {{ stats.losses }}L</div>
+      </div>
+    </div>
+
+    <!-- KDA -->
+    <div class="stat-card primary">
+      <div class="stat-icon">⚔️</div>
+      <div class="stat-content">
+        <div class="stat-label">KDA Ratio</div>
+        <div class="stat-value" [style.color]="getKDAColor()">
+          {{ getKDA() | number:'1.2-2' }}
+        </div>
+        <div class="stat-detail">
+          {{ stats.avgKills | number:'1.1-1' }} /
+          {{ stats.avgDeaths | number:'1.1-1' }} /
+          {{ stats.avgAssists | number:'1.1-1' }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Average Gold -->
+    <div class="stat-card">
+      <div class="stat-label">Avg Gold</div>
+      <div class="stat-value gold">
+        {{ formatNumber(stats.avgGold) }}
+      </div>
+    </div>
+
+    <!-- Average Damage -->
+    <div class="stat-card">
+      <div class="stat-label">Avg Damage</div>
+      <div class="stat-value damage">
+        {{ formatNumber(stats.avgDamage) }}
+      </div>
+    </div>
+
+    <!-- Average CS -->
+    <div class="stat-card">
+      <div class="stat-label">Avg CS</div>
+      <div class="stat-value cs">
+        {{ stats.avgCS | number:'1.1-1' }}
+      </div>
+    </div>
+
+    <!-- Multikills -->
+    <div class="stat-card">
+      <div class="stat-label">Multikills</div>
+      <div class="stat-value multikill">
+        <div class="multikill-row" *ngIf="stats.pentaKills > 0">
+          <span class="badge penta">Penta: {{ stats.pentaKills }}</span>
+        </div>
+        <div class="multikill-row" *ngIf="stats.quadraKills > 0">
+          <span class="badge quadra">Quadra: {{ stats.quadraKills }}</span>
+        </div>
+        <div class="multikill-row" *ngIf="stats.tripleKills > 0">
+          <span class="badge triple">Triple: {{ stats.tripleKills }}</span>
+        </div>
+        <div class="multikill-row" *ngIf="!stats.pentaKills && !stats.quadraKills && !stats.tripleKills">
+          <span class="muted">None</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-totals">
+    <div class="total-item">
+      <span class="total-label">Total Kills:</span>
+      <span class="total-value">{{ stats.totalKills }}</span>
+    </div>
+    <div class="total-item">
+      <span class="total-label">Total Deaths:</span>
+      <span class="total-value">{{ stats.totalDeaths }}</span>
+    </div>
+    <div class="total-item">
+      <span class="total-label">Total Assists:</span>
+      <span class="total-value">{{ stats.totalAssists }}</span>
+    </div>
+  </div>
+</div>

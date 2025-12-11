@@ -1,0 +1,70 @@
+<div class="pagination-container">
+  <div class="pagination-info">
+    Showing {{ startItem }} - {{ endItem }} of {{ totalItems }} items
+  </div>
+
+  <div class="pagination-controls">
+    <!-- First Page -->
+    <button
+      class="page-btn nav-btn"
+      (click)="goToFirstPage()"
+      [disabled]="currentPage === 1"
+      title="First page">
+      <span>⏮ First</span>
+    </button>
+
+    <!-- Previous Page -->
+    <button
+      class="page-btn nav-btn"
+      (click)="goToPreviousPage()"
+      [disabled]="currentPage === 1"
+      title="Previous page">
+      <span>◀ Prev</span>
+    </button>
+
+    <!-- Page Numbers -->
+    <button
+      *ngFor="let page of pages"
+      class="page-btn"
+      [class.active]="page === currentPage"
+      [class.ellipsis]="page === -1"
+      [disabled]="page === -1"
+      (click)="onPageChange(page)">
+      {{ page === -1 ? '...' : page }}
+    </button>
+
+    <!-- Next Page -->
+    <button
+      class="page-btn nav-btn"
+      (click)="goToNextPage()"
+      [disabled]="currentPage === totalPages"
+      title="Next page">
+      <span>Next ▶</span>
+    </button>
+
+    <!-- Last Page -->
+    <button
+      class="page-btn nav-btn"
+      (click)="goToLastPage()"
+      [disabled]="currentPage === totalPages"
+      title="Last page">
+      <span>Last ⏭</span>
+    </button>
+  </div>
+
+  <!-- Direct Page Jump -->
+  <div class="page-jump">
+    <label for="pageInput">Go to page:</label>
+    <input
+      id="pageInput"
+      type="number"
+      [(ngModel)]="targetPage"
+      [min]="1"
+      [max]="totalPages"
+      (keyup.enter)="jumpToPage()"
+      placeholder="Page #">
+    <button class="jump-btn-go" (click)="jumpToPage()" [disabled]="!isValidPage()">
+      Go
+    </button>
+  </div>
+</div>

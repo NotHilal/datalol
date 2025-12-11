@@ -1,0 +1,63 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    <div class="navbar-brand">
+      <a routerLink="/" class="brand-link">
+        <span class="brand-icon">⚔️</span>
+        <span class="brand-text">LoL Analytics</span>
+      </a>
+    </div>
+
+    <button class="menu-toggle" (click)="toggleMenu()" [class.active]="menuOpen">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <div class="navbar-menu" [class.open]="menuOpen">
+      <a
+        routerLink="/"
+        class="nav-link"
+        [class.active]="isActive('/')"
+        (click)="menuOpen = false">
+        <span class="nav-icon">🏠</span>
+        <span>Dashboard</span>
+      </a>
+
+      <a
+        routerLink="/matches"
+        class="nav-link"
+        [class.active]="isActive('/matches')"
+        (click)="menuOpen = false">
+        <span class="nav-icon">🎮</span>
+        <span>Matches</span>
+      </a>
+
+      <a
+        routerLink="/players"
+        class="nav-link"
+        [class.active]="isActive('/players')"
+        (click)="menuOpen = false">
+        <span class="nav-icon">👥</span>
+        <span>Players</span>
+      </a>
+
+      <a
+        routerLink="/statistics"
+        class="nav-link"
+        [class.active]="isActive('/statistics')"
+        (click)="menuOpen = false">
+        <span class="nav-icon">📊</span>
+        <span>Statistics</span>
+      </a>
+
+      <a
+        routerLink="/ml"
+        class="nav-link"
+        [class.active]="isActive('/ml')"
+        (click)="menuOpen = false">
+        <span class="nav-icon">🤖</span>
+        <span>Machine Learning</span>
+      </a>
+    </div>
+  </div>
+</nav>

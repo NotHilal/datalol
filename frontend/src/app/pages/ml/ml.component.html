@@ -1,0 +1,1033 @@
+<div class="ml-container">
+  <header class="page-header">
+    <h1>Machine Learning Models</h1>
+    <p>Explore predictive analytics and insights from 101K+ League of Legends matches</p>
+  </header>
+
+  <!-- Tab Navigation -->
+  <div class="tabs">
+    <button
+      class="tab"
+      [class.active]="selectedTab === 'overview'"
+      (click)="selectTab('overview')">
+      Overview
+    </button>
+    <button
+      class="tab"
+      [class.active]="selectedTab === 'predictions'"
+      (click)="selectTab('predictions')">
+      Make Predictions
+    </button>
+    <button
+      class="tab"
+      [class.active]="selectedTab === 'visualizations'"
+      (click)="selectTab('visualizations')">
+      Visualizations
+    </button>
+    <button
+      class="tab"
+      [class.active]="selectedTab === 'clusters'"
+      (click)="selectTab('clusters')">
+      Champion Clusters
+    </button>
+    <button
+      class="tab"
+      [class.active]="selectedTab === 'draft'"
+      (click)="selectTab('draft')">
+      Draft Prediction
+    </button>
+  </div>
+
+  <!-- Overview Tab -->
+  <div *ngIf="selectedTab === 'overview'" class="tab-content">
+    <div class="models-grid">
+      <div *ngFor="let model of models" class="model-card">
+        <div class="model-header">
+          <h3>{{ model.name }}</h3>
+          <span class="model-type">{{ model.type }}</span>
+        </div>
+        <p class="model-description">{{ model.description }}</p>
+        <div class="model-details">
+          <div class="detail">
+            <span class="label">Algorithm:</span>
+            <span class="value">{{ model.algorithm }}</span>
+          </div>
+          <div class="detail" *ngIf="model.accuracy">
+            <span class="label">Accuracy:</span>
+            <span class="value">{{ (model.accuracy * 100).toFixed(2) }}%</span>
+          </div>
+          <div class="detail" *ngIf="model.rmse">
+            <span class="label">RMSE:</span>
+            <span class="value">{{ model.rmse.toFixed(2) }} min</span>
+          </div>
+          <div class="detail" *ngIf="model.clusters">
+            <span class="label">Clusters:</span>
+            <span class="value">{{ model.clusters }}</span>
+          </div>
+        </div>
+        <div class="model-status" [class.available]="model.available">
+          {{ model.available ? 'Available' : 'Not Available' }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Sample Predictions -->
+    <div *ngIf="samplePredictions" class="sample-predictions">
+      <h2>Model Performance on Sample Data</h2>
+
+      <div class="performance-metrics">
+        <div class="metric-card">
+          <h4>Match Prediction Accuracy</h4>
+          <div class="metric-value" [ngClass]="getAccuracyClass(samplePredictions.match_accuracy)">
+            {{ (samplePredictions.match_accuracy * 100).toFixed(1) }}%
+          </div>
+          <p>{{ samplePredictions.match_predictions.length }} test matches</p>
+        </div>
+        <div class="metric-card">
+          <h4>Duration Prediction Error</h4>
+          <div class="metric-value">
+            ±{{ samplePredictions.avg_duration_error.toFixed(2) }} min
+          </div>
+          <p>Average error across {{ samplePredictions.duration_predictions.length }} matches</p>
+        </div>
+      </div>
+
+      <div class="prediction-samples">
+        <h3>Sample Match Predictions</h3>
+        <table class="predictions-table">
+          <thead>
+            <tr>
+              <th>Match ID</th>
+              <th>Predicted</th>
+              <th>Actual</th>
+              <th>Confidence</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let pred of samplePredictions.match_predictions">
+              <td>{{ pred.matchId.substring(0, 12) }}...</td>
+              <td>{{ pred.predicted_winner }}</td>
+              <td>{{ pred.actual_winner }}</td>
+              <td [ngClass]="getConfidenceClass(pred.confidence)">
+                {{ (pred.confidence * 100).toFixed(1) }}%
+              </td>
+              <td>
+                <span class="result-badge" [class.correct]="pred.correct">
+                  {{ pred.correct ? '✓ Correct' : '✗ Wrong' }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Predictions Tab -->
+  <div *ngIf="selectedTab === 'predictions'" class="tab-content">
+    <div class="prediction-interface">
+      <h2>Make Custom Predictions</h2>
+      <p>Enter match statistics to predict the outcome and duration</p>
+
+      <div class="prediction-form">
+        <div class="team-inputs">
+          <!-- Blue Team -->
+          <div class="team-section blue-team">
+            <h3>Blue Team</h3>
+            <div class="input-grid">
+              <div class="input-group">
+                <label>Kills</label>
+                <input type="number" [(ngModel)]="predictionForm.blue_kills" min="0">
+              </div>
+              <div class="input-group">
+                <label>Deaths</label>
+                <input type="number" [(ngModel)]="predictionForm.blue_deaths" min="0">
+              </div>
+              <div class="input-group">
+                <label>Assists</label>
+                <input type="number" [(ngModel)]="predictionForm.blue_assists" min="0">
+              </div>
+              <div class="input-group">
+                <label>Gold</label>
+                <input type="number" [(ngModel)]="predictionForm.blue_gold" min="0" step="1000">
+              </div>
+              <div class="input-group">
+                <label>Damage</label>
+                <input type="number" [(ngModel)]="predictionForm.blue_damage" min="0" step="1000">
+              </div>
+              <div class="input-group">
+                <label>CS</label>
+                <input type="number" [(ngModel)]="predictionForm.blue_cs" min="0">
+              </div>
+              <div class="input-group">
+                <label>Barons</label>
+                <input type="number" [(ngModel)]="predictionForm.blue_barons" min="0" max="5">
+              </div>
+              <div class="input-group">
+                <label>Dragons</label>
+                <input type="number" [(ngModel)]="predictionForm.blue_dragons" min="0" max="10">
+              </div>
+              <div class="input-group">
+                <label>Towers</label>
+                <input type="number" [(ngModel)]="predictionForm.blue_towers" min="0" max="11">
+              </div>
+            </div>
+          </div>
+
+          <!-- Red Team -->
+          <div class="team-section red-team">
+            <h3>Red Team</h3>
+            <div class="input-grid">
+              <div class="input-group">
+                <label>Kills</label>
+                <input type="number" [(ngModel)]="predictionForm.red_kills" min="0">
+              </div>
+              <div class="input-group">
+                <label>Deaths</label>
+                <input type="number" [(ngModel)]="predictionForm.red_deaths" min="0">
+              </div>
+              <div class="input-group">
+                <label>Assists</label>
+                <input type="number" [(ngModel)]="predictionForm.red_assists" min="0">
+              </div>
+              <div class="input-group">
+                <label>Gold</label>
+                <input type="number" [(ngModel)]="predictionForm.red_gold" min="0" step="1000">
+              </div>
+              <div class="input-group">
+                <label>Damage</label>
+                <input type="number" [(ngModel)]="predictionForm.red_damage" min="0" step="1000">
+              </div>
+              <div class="input-group">
+                <label>CS</label>
+                <input type="number" [(ngModel)]="predictionForm.red_cs" min="0">
+              </div>
+              <div class="input-group">
+                <label>Barons</label>
+                <input type="number" [(ngModel)]="predictionForm.red_barons" min="0" max="5">
+              </div>
+              <div class="input-group">
+                <label>Dragons</label>
+                <input type="number" [(ngModel)]="predictionForm.red_dragons" min="0" max="10">
+              </div>
+              <div class="input-group">
+                <label>Towers</label>
+                <input type="number" [(ngModel)]="predictionForm.red_towers" min="0" max="11">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn-primary" (click)="predictMatch()">Predict Winner</button>
+          <button class="btn-primary" (click)="predictDuration()">Predict Duration</button>
+          <button class="btn-secondary" (click)="resetForm()">Reset</button>
+        </div>
+
+        <!-- Prediction Results -->
+        <div *ngIf="predictionResult" class="prediction-result">
+          <h3>Match Outcome Prediction</h3>
+          <div class="result-content">
+            <div class="predicted-winner" [class.blue]="predictionResult.predicted_value === 1">
+              <h4>Predicted Winner:</h4>
+              <p class="winner-text">{{ predictionResult.prediction }}</p>
+            </div>
+            <div class="confidence-meter">
+              <h4>Confidence:</h4>
+              <div class="confidence-bar">
+                <div
+                  class="confidence-fill"
+                  [style.width.%]="predictionResult.confidence * 100"
+                  [ngClass]="getConfidenceClass(predictionResult.confidence)">
+                </div>
+              </div>
+              <p>{{ (predictionResult.confidence * 100).toFixed(1) }}%</p>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="durationResult" class="prediction-result">
+          <h3>Game Duration Prediction</h3>
+          <div class="result-content">
+            <div class="duration-display">
+              <h4>Predicted Duration:</h4>
+              <p class="duration-text">{{ durationResult.predicted_duration_formatted }}</p>
+              <p class="duration-minutes">{{ durationResult.predicted_duration_minutes.toFixed(1) }} minutes</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Visualizations Tab -->
+  <div *ngIf="selectedTab === 'visualizations'" class="tab-content">
+    <div class="visualizations-section">
+      <h2>Model Visualizations</h2>
+
+      <!-- Match Prediction Visualizations -->
+      <div class="viz-category">
+        <h3>Match Outcome Prediction</h3>
+        <div class="carousel-container" *ngIf="visualizations.match_prediction && visualizations.match_prediction.length > 0">
+          <button class="carousel-btn prev" (click)="prevMatchImage()" [disabled]="visualizations.match_prediction.length <= 1">
+            &#10094;
+          </button>
+          <div class="carousel-content">
+            <img
+              [src]="getVisualizationUrl(visualizations.match_prediction[currentMatchIndex])"
+              [alt]="visualizations.match_prediction[currentMatchIndex]"
+              class="carousel-image">
+            <div class="carousel-caption">
+              <h4>{{ formatImageName(visualizations.match_prediction[currentMatchIndex]) }}</h4>
+              <p class="carousel-counter">{{ currentMatchIndex + 1 }} / {{ visualizations.match_prediction.length }}</p>
+            </div>
+          </div>
+          <button class="carousel-btn next" (click)="nextMatchImage()" [disabled]="visualizations.match_prediction.length <= 1">
+            &#10095;
+          </button>
+        </div>
+      </div>
+
+      <!-- Duration Prediction Visualizations -->
+      <div class="viz-category">
+        <h3>Game Duration Prediction</h3>
+        <div class="carousel-container" *ngIf="visualizations.duration_prediction && visualizations.duration_prediction.length > 0">
+          <button class="carousel-btn prev" (click)="prevDurationImage()" [disabled]="visualizations.duration_prediction.length <= 1">
+            &#10094;
+          </button>
+          <div class="carousel-content">
+            <img
+              [src]="getVisualizationUrl(visualizations.duration_prediction[currentDurationIndex])"
+              [alt]="visualizations.duration_prediction[currentDurationIndex]"
+              class="carousel-image">
+            <div class="carousel-caption">
+              <h4>{{ formatImageName(visualizations.duration_prediction[currentDurationIndex]) }}</h4>
+              <p class="carousel-counter">{{ currentDurationIndex + 1 }} / {{ visualizations.duration_prediction.length }}</p>
+            </div>
+          </div>
+          <button class="carousel-btn next" (click)="nextDurationImage()" [disabled]="visualizations.duration_prediction.length <= 1">
+            &#10095;
+          </button>
+        </div>
+      </div>
+
+      <!-- Champion Clustering Visualizations -->
+      <div class="viz-category">
+        <h3>Champion Clustering</h3>
+        <div class="carousel-container" *ngIf="visualizations.champion_clustering && visualizations.champion_clustering.length > 0">
+          <button class="carousel-btn prev" (click)="prevClusterImage()" [disabled]="visualizations.champion_clustering.length <= 1">
+            &#10094;
+          </button>
+          <div class="carousel-content">
+            <img
+              [src]="getVisualizationUrl(visualizations.champion_clustering[currentClusterIndex])"
+              [alt]="visualizations.champion_clustering[currentClusterIndex]"
+              class="carousel-image">
+            <div class="carousel-caption">
+              <h4>{{ formatImageName(visualizations.champion_clustering[currentClusterIndex]) }}</h4>
+              <p class="carousel-counter">{{ currentClusterIndex + 1 }} / {{ visualizations.champion_clustering.length }}</p>
+            </div>
+          </div>
+          <button class="carousel-btn next" (click)="nextClusterImage()" [disabled]="visualizations.champion_clustering.length <= 1">
+            &#10095;
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Champion Clusters Tab -->
+  <div *ngIf="selectedTab === 'clusters'" class="tab-content">
+    <div *ngIf="championClusters" class="clusters-section">
+      <h2>Champion Archetypes</h2>
+      <p>{{ championClusters.total_champions }} champions analyzed and grouped into {{ championClusters.num_clusters }} distinct playstyle archetypes using machine learning</p>
+
+      <div class="clusters-grid">
+        <div *ngFor="let cluster of championClusters.clusters" class="cluster-card">
+          <div class="cluster-header">
+            <div class="cluster-title">
+              <h3>{{ cluster.archetype }}</h3>
+              <p class="cluster-description">{{ cluster.description }}</p>
+            </div>
+            <span class="cluster-size">{{ cluster.size }} champions</span>
+          </div>
+
+          <div class="cluster-playstyle">
+            <strong>Playstyle:</strong> {{ cluster.playstyle }}
+          </div>
+
+          <div class="champion-list">
+            <h4>Top Champions:</h4>
+            <div *ngFor="let champ of cluster.champions" class="champion-item">
+              <span class="champion-name">{{ champ.champion }}</span>
+              <div class="champion-stats">
+                <span>{{ formatNumber(champ.winRate, 1) }}% WR</span>
+                <span>{{ formatNumber(champ.avgKDA, 2) }} KDA</span>
+                <span>{{ champ.totalGames }} games</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Draft Prediction Tab -->
+  <div *ngIf="selectedTab === 'draft'" class="tab-content">
+    <div class="draft-prediction-section">
+      <h2>Champion Draft Prediction</h2>
+      <p>Select 5 champions for each team and predict which team will win before the game starts!</p>
+
+      <!-- New Layout: Selectors on sides, Map in center -->
+      <div class="draft-layout">
+        <!-- Blue Team Column (Left) -->
+        <div class="team-column">
+          <div class="team-draft blue-team-draft">
+            <h3>Blue Team</h3>
+            <div class="champion-selects">
+            <div class="champion-select">
+              <label>Top</label>
+              <div class="select-with-icon">
+                <img
+                  *ngIf="blueTeam[0] && blueTeam[0] !== ''"
+                  [src]="getChampionImageUrl(blueTeam[0])"
+                  [alt]="blueTeam[0]"
+                  class="champion-icon-inline"
+                  (error)="onChampionImageError($event)">
+                <select [(ngModel)]="blueTeam[0]" [class.invalid-select]="!blueTeam[0] || blueTeam[0] === ''" [class.has-icon]="blueTeam[0] && blueTeam[0] !== ''">
+                  <option value="">-- Select Champion --</option>
+                  <option *ngFor="let c of champions" [value]="c">{{ c }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="champion-select">
+              <label>Jungle</label>
+              <div class="select-with-icon">
+                <img
+                  *ngIf="blueTeam[1] && blueTeam[1] !== ''"
+                  [src]="getChampionImageUrl(blueTeam[1])"
+                  [alt]="blueTeam[1]"
+                  class="champion-icon-inline"
+                  (error)="onChampionImageError($event)">
+                <select [(ngModel)]="blueTeam[1]" [class.invalid-select]="!blueTeam[1] || blueTeam[1] === ''" [class.has-icon]="blueTeam[1] && blueTeam[1] !== ''">
+                  <option value="">-- Select Champion --</option>
+                  <option *ngFor="let c of champions" [value]="c">{{ c }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="champion-select">
+              <label>Mid</label>
+              <div class="select-with-icon">
+                <img
+                  *ngIf="blueTeam[2] && blueTeam[2] !== ''"
+                  [src]="getChampionImageUrl(blueTeam[2])"
+                  [alt]="blueTeam[2]"
+                  class="champion-icon-inline"
+                  (error)="onChampionImageError($event)">
+                <select [(ngModel)]="blueTeam[2]" [class.invalid-select]="!blueTeam[2] || blueTeam[2] === ''" [class.has-icon]="blueTeam[2] && blueTeam[2] !== ''">
+                  <option value="">-- Select Champion --</option>
+                  <option *ngFor="let c of champions" [value]="c">{{ c }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="champion-select">
+              <label>ADC</label>
+              <div class="select-with-icon">
+                <img
+                  *ngIf="blueTeam[3] && blueTeam[3] !== ''"
+                  [src]="getChampionImageUrl(blueTeam[3])"
+                  [alt]="blueTeam[3]"
+                  class="champion-icon-inline"
+                  (error)="onChampionImageError($event)">
+                <select [(ngModel)]="blueTeam[3]" [class.invalid-select]="!blueTeam[3] || blueTeam[3] === ''" [class.has-icon]="blueTeam[3] && blueTeam[3] !== ''">
+                  <option value="">-- Select Champion --</option>
+                  <option *ngFor="let c of champions" [value]="c">{{ c }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="champion-select">
+              <label>Support</label>
+              <div class="select-with-icon">
+                <img
+                  *ngIf="blueTeam[4] && blueTeam[4] !== ''"
+                  [src]="getChampionImageUrl(blueTeam[4])"
+                  [alt]="blueTeam[4]"
+                  class="champion-icon-inline"
+                  (error)="onChampionImageError($event)">
+                <select [(ngModel)]="blueTeam[4]" [class.invalid-select]="!blueTeam[4] || blueTeam[4] === ''" [class.has-icon]="blueTeam[4] && blueTeam[4] !== ''">
+                  <option value="">-- Select Champion --</option>
+                  <option *ngFor="let c of champions" [value]="c">{{ c }}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          </div>
+
+          <!-- Blue Team Action Buttons -->
+          <div class="draft-controls">
+            <button class="btn-secondary" (click)="fillSampleDraft()">Fill Sample Draft</button>
+            <button class="btn-secondary" (click)="resetDraft()">Reset</button>
+          </div>
+        </div>
+
+        <!-- Map Visualization (Center) -->
+        <div class="map-visualization">
+        <h3>Draft Map Preview</h3>
+        <div class="map-container">
+          <img src="https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/content/src/leagueclient/gamemodeassets/classic_sru/img/map-south.png"
+               alt="Summoner's Rift"
+               class="map-background"
+               (error)="onMapImageError($event)">
+
+          <!-- Blue Team Champions on Map -->
+          <div class="map-champion blue-top">
+            <img [src]="blueTeam[0] && blueTeam[0] !== '' ? getChampionImageUrl(blueTeam[0]) : 'assets/what.jpg'"
+                 [alt]="blueTeam[0] || '??'"
+                 (error)="onMapChampionImageError($event, 'blue')">
+            <span class="role-label">TOP</span>
+          </div>
+
+          <div class="map-champion blue-jungle">
+            <img [src]="blueTeam[1] && blueTeam[1] !== '' ? getChampionImageUrl(blueTeam[1]) : 'assets/what.jpg'"
+                 [alt]="blueTeam[1] || '??'"
+                 (error)="onMapChampionImageError($event, 'blue')">
+            <span class="role-label">JGL</span>
+          </div>
+
+          <div class="map-champion blue-mid">
+            <img [src]="blueTeam[2] && blueTeam[2] !== '' ? getChampionImageUrl(blueTeam[2]) : 'assets/what.jpg'"
+                 [alt]="blueTeam[2] || '??'"
+                 (error)="onMapChampionImageError($event, 'blue')">
+            <span class="role-label">MID</span>
+          </div>
+
+          <div class="map-champion blue-adc">
+            <img [src]="blueTeam[3] && blueTeam[3] !== '' ? getChampionImageUrl(blueTeam[3]) : 'assets/what.jpg'"
+                 [alt]="blueTeam[3] || '??'"
+                 (error)="onMapChampionImageError($event, 'blue')">
+            <span class="role-label">ADC</span>
+          </div>
+
+          <div class="map-champion blue-support">
+            <img [src]="blueTeam[4] && blueTeam[4] !== '' ? getChampionImageUrl(blueTeam[4]) : 'assets/what.jpg'"
+                 [alt]="blueTeam[4] || '??'"
+                 (error)="onMapChampionImageError($event, 'blue')">
+            <span class="role-label">SUP</span>
+          </div>
+
+          <!-- Red Team Champions on Map -->
+          <div class="map-champion red-top">
+            <img [src]="redTeam[0] && redTeam[0] !== '' ? getChampionImageUrl(redTeam[0]) : 'assets/what.jpg'"
+                 [alt]="redTeam[0] || '??'"
+                 (error)="onMapChampionImageError($event, 'red')">
+            <span class="role-label">TOP</span>
+          </div>
+
+          <div class="map-champion red-jungle">
+            <img [src]="redTeam[1] && redTeam[1] !== '' ? getChampionImageUrl(redTeam[1]) : 'assets/what.jpg'"
+                 [alt]="redTeam[1] || '??'"
+                 (error)="onMapChampionImageError($event, 'red')">
+            <span class="role-label">JGL</span>
+          </div>
+
+          <div class="map-champion red-mid">
+            <img [src]="redTeam[2] && redTeam[2] !== '' ? getChampionImageUrl(redTeam[2]) : 'assets/what.jpg'"
+                 [alt]="redTeam[2] || '??'"
+                 (error)="onMapChampionImageError($event, 'red')">
+            <span class="role-label">MID</span>
+          </div>
+
+          <div class="map-champion red-adc">
+            <img [src]="redTeam[3] && redTeam[3] !== '' ? getChampionImageUrl(redTeam[3]) : 'assets/what.jpg'"
+                 [alt]="redTeam[3] || '??'"
+                 (error)="onMapChampionImageError($event, 'red')">
+            <span class="role-label">ADC</span>
+          </div>
+
+          <div class="map-champion red-support">
+            <img [src]="redTeam[4] && redTeam[4] !== '' ? getChampionImageUrl(redTeam[4]) : 'assets/what.jpg'"
+                 [alt]="redTeam[4] || '??'"
+                 (error)="onMapChampionImageError($event, 'red')">
+            <span class="role-label">SUP</span>
+          </div>
+        </div>
+      </div>
+
+        <!-- Red Team Column (Right) -->
+        <div class="team-column">
+          <div class="team-draft red-team-draft">
+            <h3>Red Team</h3>
+            <div class="champion-selects">
+            <div class="champion-select">
+              <label>Top</label>
+              <div class="select-with-icon">
+                <img
+                  *ngIf="redTeam[0] && redTeam[0] !== ''"
+                  [src]="getChampionImageUrl(redTeam[0])"
+                  [alt]="redTeam[0]"
+                  class="champion-icon-inline"
+                  (error)="onChampionImageError($event)">
+                <select [(ngModel)]="redTeam[0]" [class.invalid-select]="!redTeam[0] || redTeam[0] === ''" [class.has-icon]="redTeam[0] && redTeam[0] !== ''">
+                  <option value="">-- Select Champion --</option>
+                  <option *ngFor="let c of champions" [value]="c">{{ c }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="champion-select">
+              <label>Jungle</label>
+              <div class="select-with-icon">
+                <img
+                  *ngIf="redTeam[1] && redTeam[1] !== ''"
+                  [src]="getChampionImageUrl(redTeam[1])"
+                  [alt]="redTeam[1]"
+                  class="champion-icon-inline"
+                  (error)="onChampionImageError($event)">
+                <select [(ngModel)]="redTeam[1]" [class.invalid-select]="!redTeam[1] || redTeam[1] === ''" [class.has-icon]="redTeam[1] && redTeam[1] !== ''">
+                  <option value="">-- Select Champion --</option>
+                  <option *ngFor="let c of champions" [value]="c">{{ c }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="champion-select">
+              <label>Mid</label>
+              <div class="select-with-icon">
+                <img
+                  *ngIf="redTeam[2] && redTeam[2] !== ''"
+                  [src]="getChampionImageUrl(redTeam[2])"
+                  [alt]="redTeam[2]"
+                  class="champion-icon-inline"
+                  (error)="onChampionImageError($event)">
+                <select [(ngModel)]="redTeam[2]" [class.invalid-select]="!redTeam[2] || redTeam[2] === ''" [class.has-icon]="redTeam[2] && redTeam[2] !== ''">
+                  <option value="">-- Select Champion --</option>
+                  <option *ngFor="let c of champions" [value]="c">{{ c }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="champion-select">
+              <label>ADC</label>
+              <div class="select-with-icon">
+                <img
+                  *ngIf="redTeam[3] && redTeam[3] !== ''"
+                  [src]="getChampionImageUrl(redTeam[3])"
+                  [alt]="redTeam[3]"
+                  class="champion-icon-inline"
+                  (error)="onChampionImageError($event)">
+                <select [(ngModel)]="redTeam[3]" [class.invalid-select]="!redTeam[3] || redTeam[3] === ''" [class.has-icon]="redTeam[3] && redTeam[3] !== ''">
+                  <option value="">-- Select Champion --</option>
+                  <option *ngFor="let c of champions" [value]="c">{{ c }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="champion-select">
+              <label>Support</label>
+              <div class="select-with-icon">
+                <img
+                  *ngIf="redTeam[4] && redTeam[4] !== ''"
+                  [src]="getChampionImageUrl(redTeam[4])"
+                  [alt]="redTeam[4]"
+                  class="champion-icon-inline"
+                  (error)="onChampionImageError($event)">
+                <select [(ngModel)]="redTeam[4]" [class.invalid-select]="!redTeam[4] || redTeam[4] === ''" [class.has-icon]="redTeam[4] && redTeam[4] !== ''">
+                  <option value="">-- Select Champion --</option>
+                  <option *ngFor="let c of champions" [value]="c">{{ c }}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          </div>
+
+          <!-- Red Team Action Button -->
+          <div class="draft-action">
+            <button class="btn-primary btn-large" (click)="predictDraftOutcome()">
+              Predict Winner
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Draft Prediction Results Modal -->
+      <div *ngIf="showResultsModal && draftPrediction" class="modal-overlay" (click)="closeResultsModal()">
+        <div class="modal-content draft-result-modal" (click)="$event.stopPropagation()">
+        <div class="result-header">
+          <h3>Prediction Results</h3>
+          <div class="header-buttons">
+            <button class="btn-details" (click)="toggleDetailsModal()">
+              Show Calculation Details
+            </button>
+            <button class="modal-close" (click)="closeResultsModal()">&times;</button>
+          </div>
+        </div>
+
+        <div class="result-main">
+          <div class="predicted-winner-draft" [class.blue]="draftPrediction.predicted_value === 1" [class.red]="draftPrediction.predicted_value === 0">
+            <h4>Predicted Winner:</h4>
+            <p class="winner-text-draft">{{ draftPrediction.prediction }}</p>
+          </div>
+
+          <div class="confidence-display">
+            <h4>Confidence:</h4>
+            <div class="confidence-bar-draft">
+              <div class="confidence-fill-draft blue-fill" [style.width.%]="draftPrediction.probabilities.blue_team * 100"></div>
+              <div class="confidence-fill-draft red-fill" [style.width.%]="draftPrediction.probabilities.red_team * 100"></div>
+            </div>
+            <div class="confidence-labels">
+              <span class="blue-label">Blue: {{ (draftPrediction.probabilities.blue_team * 100).toFixed(1) }}%</span>
+              <span class="red-label">Red: {{ (draftPrediction.probabilities.red_team * 100).toFixed(1) }}%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="team-analysis">
+          <h4>Team Composition Analysis</h4>
+          <div class="analysis-grid">
+            <div class="analysis-item">
+              <span class="analysis-label">Blue Team Strength:</span>
+              <span class="analysis-value">{{ (draftPrediction.analysis.blue_team_strength * 100).toFixed(1) }}%</span>
+            </div>
+            <div class="analysis-item">
+              <span class="analysis-label">Red Team Strength:</span>
+              <span class="analysis-value">{{ (draftPrediction.analysis.red_team_strength * 100).toFixed(1) }}%</span>
+            </div>
+            <div class="analysis-item">
+              <span class="analysis-label">Win Rate Advantage:</span>
+              <span class="analysis-value">{{ draftPrediction.analysis.win_rate_advantage }} Team</span>
+            </div>
+            <div class="analysis-item">
+              <span class="analysis-label">Damage Advantage:</span>
+              <span class="analysis-value">{{ draftPrediction.analysis.damage_advantage }} Team</span>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <!-- Calculation Details Modal -->
+      <div *ngIf="showDetailsModal && draftPrediction" class="modal-overlay" (click)="closeDetailsModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h2>Prediction Calculation Details</h2>
+            <button class="modal-close" (click)="closeDetailsModal()">&times;</button>
+          </div>
+
+          <div class="modal-body">
+            <div class="detail-section">
+              <h3>How the Prediction Works</h3>
+              <p class="explanation">
+                The draft prediction model uses a <strong>Random Forest Classifier</strong> trained on
+                <strong>19,998 real matches</strong>. It analyzes team composition statistics to predict
+                the winner before the game starts.
+              </p>
+            </div>
+
+            <div class="detail-section">
+              <h3>Selected Champions</h3>
+              <div class="teams-display">
+                <div class="team-column blue-column">
+                  <h4>Blue Team</h4>
+                  <ul>
+                    <li *ngFor="let champ of blueTeam">{{ champ }}</li>
+                  </ul>
+                </div>
+                <div class="team-column red-column">
+                  <h4>Red Team</h4>
+                  <ul>
+                    <li *ngFor="let champ of redTeam">{{ champ }}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <h3>Team Statistics Analyzed</h3>
+              <p class="sub-explanation">
+                The model calculates the following statistics for each team based on historical performance:
+              </p>
+
+              <div class="stats-comparison">
+                <div class="stat-row header-row">
+                  <div class="stat-label">Feature</div>
+                  <div class="stat-blue">Blue Team</div>
+                  <div class="stat-red">Red Team</div>
+                  <div class="stat-diff">Advantage</div>
+                </div>
+
+                <div class="stat-row">
+                  <div class="stat-label">Average Win Rate</div>
+                  <div class="stat-blue">{{ (draftPrediction.analysis.blue_team_strength * 100).toFixed(1) }}%</div>
+                  <div class="stat-red">{{ (draftPrediction.analysis.red_team_strength * 100).toFixed(1) }}%</div>
+                  <div class="stat-diff" [class.blue-advantage]="draftPrediction.analysis.win_rate_advantage === 'Blue'" [class.red-advantage]="draftPrediction.analysis.win_rate_advantage === 'Red'">
+                    {{ draftPrediction.analysis.win_rate_advantage }}
+                  </div>
+                </div>
+
+                <div class="stat-row">
+                  <div class="stat-label">Average KDA</div>
+                  <div class="stat-blue">{{ draftPrediction.analysis.blue_avg_kda.toFixed(2) }}</div>
+                  <div class="stat-red">{{ draftPrediction.analysis.red_avg_kda.toFixed(2) }}</div>
+                  <div class="stat-diff" [class.blue-advantage]="draftPrediction.analysis.blue_avg_kda > draftPrediction.analysis.red_avg_kda" [class.red-advantage]="draftPrediction.analysis.red_avg_kda > draftPrediction.analysis.blue_avg_kda">
+                    {{ draftPrediction.analysis.blue_avg_kda > draftPrediction.analysis.red_avg_kda ? 'Blue' : 'Red' }}
+                  </div>
+                </div>
+
+                <div class="stat-row">
+                  <div class="stat-label">Damage Output</div>
+                  <div class="stat-blue">-</div>
+                  <div class="stat-red">-</div>
+                  <div class="stat-diff" [class.blue-advantage]="draftPrediction.analysis.damage_advantage === 'Blue'" [class.red-advantage]="draftPrediction.analysis.damage_advantage === 'Red'">
+                    {{ draftPrediction.analysis.damage_advantage }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Detailed Feature Values (New Section) -->
+            <div class="detail-section" *ngIf="draftPrediction.features">
+              <h3>Calculated Feature Values for This Prediction</h3>
+              <p class="sub-explanation">
+                Here are the actual computed values used by the model for this specific draft:
+              </p>
+
+              <div class="features-breakdown">
+                <h4>Blue Team Features</h4>
+                <div class="feature-grid">
+                  <div class="feature-item">
+                    <span class="feature-name">Win Rate:</span>
+                    <span class="feature-value blue-val">{{ (draftPrediction.features.blue_team.avg_win_rate * 100).toFixed(2) }}%</span>
+                  </div>
+                  <div class="feature-item">
+                    <span class="feature-name">KDA:</span>
+                    <span class="feature-value blue-val">{{ draftPrediction.features.blue_team.avg_kda.toFixed(2) }}</span>
+                  </div>
+                  <div class="feature-item">
+                    <span class="feature-name">Avg Kills:</span>
+                    <span class="feature-value blue-val">{{ draftPrediction.features.blue_team.avg_kills.toFixed(2) }}</span>
+                  </div>
+                  <div class="feature-item">
+                    <span class="feature-name">Avg Deaths:</span>
+                    <span class="feature-value blue-val">{{ draftPrediction.features.blue_team.avg_deaths.toFixed(2) }}</span>
+                  </div>
+                  <div class="feature-item">
+                    <span class="feature-name">Avg Assists:</span>
+                    <span class="feature-value blue-val">{{ draftPrediction.features.blue_team.avg_assists.toFixed(2) }}</span>
+                  </div>
+                  <div class="feature-item">
+                    <span class="feature-name">Avg Gold:</span>
+                    <span class="feature-value blue-val">{{ draftPrediction.features.blue_team.avg_gold.toFixed(0) }}</span>
+                  </div>
+                  <div class="feature-item">
+                    <span class="feature-name">Avg Damage:</span>
+                    <span class="feature-value blue-val">{{ draftPrediction.features.blue_team.avg_damage.toFixed(0) }}</span>
+                  </div>
+                  <div class="feature-item">
+                    <span class="feature-name">Avg CS:</span>
+                    <span class="feature-value blue-val">{{ draftPrediction.features.blue_team.avg_cs.toFixed(1) }}</span>
+                  </div>
+                  <div class="feature-item">
+                    <span class="feature-name">Total Games:</span>
+                    <span class="feature-value blue-val">{{ draftPrediction.features.blue_team.total_games }}</span>
+                  </div>
+                  <div class="feature-item">
+                    <span class="feature-name">Min Win Rate:</span>
+                    <span class="feature-value blue-val">{{ (draftPrediction.features.blue_team.min_win_rate * 100).toFixed(1) }}%</span>
+                  </div>
+                  <div class="feature-item">
+                    <span class="feature-name">Max Win Rate:</span>
+                    <span class="feature-value blue-val">{{ (draftPrediction.features.blue_team.max_win_rate * 100).toFixed(1) }}%</span>
+                  </div>
+                  <div class="feature-item">
+                    <span class="feature-name">Win Rate Variance:</span>
+                    <span class="feature-value blue-val">{{ (draftPrediction.features.blue_team.win_rate_variance * 100).toFixed(3) }}</span>
+                  </div>
+                </div>
+
+                <h4>Red Team Features</h4>
+                <div class="feature-grid">
+                  <div class="feature-item">
+                    <span class="feature-name">Win Rate:</span>
+                    <span class="feature-value red-val">{{ (draftPrediction.features.red_team.avg_win_rate * 100).toFixed(2) }}%</span>
+                  </div>
+                  <div class="feature-item">
+                    <span class="feature-name">KDA:</span>
+                    <span class="feature-value red-val">{{ draftPrediction.features.red_team.avg_kda.toFixed(2) }}</span>
+                  </div>
+                  <div class="feature-item">
+                    <span class="feature-name">Avg Kills:</span>
+                    <span class="feature-value red-val">{{ draftPrediction.features.red_team.avg_kills.toFixed(2) }}</span>
+                  </div>
+                  <div class="feature-item">
+                    <span class="feature-name">Avg Deaths:</span>
+                    <span class="feature-value red-val">{{ draftPrediction.features.red_team.avg_deaths.toFixed(2) }}</span>
+                  </div>
+                  <div class="feature-item">
+                    <span class="feature-name">Avg Assists:</span>
+                    <span class="feature-value red-val">{{ draftPrediction.features.red_team.avg_assists.toFixed(2) }}</span>
+                  </div>
+                  <div class="feature-item">
+                    <span class="feature-name">Avg Gold:</span>
+                    <span class="feature-value red-val">{{ draftPrediction.features.red_team.avg_gold.toFixed(0) }}</span>
+                  </div>
+                  <div class="feature-item">
+                    <span class="feature-name">Avg Damage:</span>
+                    <span class="feature-value red-val">{{ draftPrediction.features.red_team.avg_damage.toFixed(0) }}</span>
+                  </div>
+                  <div class="feature-item">
+                    <span class="feature-name">Avg CS:</span>
+                    <span class="feature-value red-val">{{ draftPrediction.features.red_team.avg_cs.toFixed(1) }}</span>
+                  </div>
+                  <div class="feature-item">
+                    <span class="feature-name">Total Games:</span>
+                    <span class="feature-value red-val">{{ draftPrediction.features.red_team.total_games }}</span>
+                  </div>
+                  <div class="feature-item">
+                    <span class="feature-name">Min Win Rate:</span>
+                    <span class="feature-value red-val">{{ (draftPrediction.features.red_team.min_win_rate * 100).toFixed(1) }}%</span>
+                  </div>
+                  <div class="feature-item">
+                    <span class="feature-name">Max Win Rate:</span>
+                    <span class="feature-value red-val">{{ (draftPrediction.features.red_team.max_win_rate * 100).toFixed(1) }}%</span>
+                  </div>
+                  <div class="feature-item">
+                    <span class="feature-name">Win Rate Variance:</span>
+                    <span class="feature-value red-val">{{ (draftPrediction.features.red_team.win_rate_variance * 100).toFixed(3) }}</span>
+                  </div>
+                </div>
+
+                <h4>Differential Features (Most Important!)</h4>
+                <div class="differentials-grid">
+                  <div class="differential-item" [class.positive]="draftPrediction.features.differentials.win_rate_diff > 0" [class.negative]="draftPrediction.features.differentials.win_rate_diff < 0">
+                    <span class="diff-name">Win Rate Difference:</span>
+                    <span class="diff-value">{{ (draftPrediction.features.differentials.win_rate_diff * 100).toFixed(2) }}%</span>
+                    <span class="diff-meaning">{{ draftPrediction.features.differentials.win_rate_diff > 0 ? '(Blue advantage)' : '(Red advantage)' }}</span>
+                  </div>
+                  <div class="differential-item" [class.positive]="draftPrediction.features.differentials.kda_diff > 0" [class.negative]="draftPrediction.features.differentials.kda_diff < 0">
+                    <span class="diff-name">KDA Difference:</span>
+                    <span class="diff-value">{{ draftPrediction.features.differentials.kda_diff.toFixed(3) }}</span>
+                    <span class="diff-meaning">{{ draftPrediction.features.differentials.kda_diff > 0 ? '(Blue advantage)' : '(Red advantage)' }}</span>
+                  </div>
+                  <div class="differential-item" [class.positive]="draftPrediction.features.differentials.gold_diff > 0" [class.negative]="draftPrediction.features.differentials.gold_diff < 0">
+                    <span class="diff-name">Gold Difference:</span>
+                    <span class="diff-value">{{ draftPrediction.features.differentials.gold_diff.toFixed(0) }}</span>
+                    <span class="diff-meaning">{{ draftPrediction.features.differentials.gold_diff > 0 ? '(Blue advantage)' : '(Red advantage)' }}</span>
+                  </div>
+                  <div class="differential-item" [class.positive]="draftPrediction.features.differentials.damage_diff > 0" [class.negative]="draftPrediction.features.differentials.damage_diff < 0">
+                    <span class="diff-name">Damage Difference:</span>
+                    <span class="diff-value">{{ draftPrediction.features.differentials.damage_diff.toFixed(0) }}</span>
+                    <span class="diff-meaning">{{ draftPrediction.features.differentials.damage_diff > 0 ? '(Blue advantage)' : '(Red advantage)' }}</span>
+                  </div>
+                  <div class="differential-item" [class.positive]="draftPrediction.features.differentials.cs_diff > 0" [class.negative]="draftPrediction.features.differentials.cs_diff < 0">
+                    <span class="diff-name">CS Difference:</span>
+                    <span class="diff-value">{{ draftPrediction.features.differentials.cs_diff.toFixed(1) }}</span>
+                    <span class="diff-meaning">{{ draftPrediction.features.differentials.cs_diff > 0 ? '(Blue advantage)' : '(Red advantage)' }}</span>
+                  </div>
+                </div>
+
+                <p class="feature-note">
+                  <strong>Note:</strong> The differential features (differences between teams) are the most important
+                  predictors. The model learned that win_rate_diff is the strongest predictor (33.8% importance).
+                </p>
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <h3>Model Decision Process</h3>
+              <div class="decision-steps">
+                <div class="step">
+                  <div class="step-number">1</div>
+                  <div class="step-content">
+                    <h4>Feature Extraction</h4>
+                    <p>Calculate 23 features including average win rates, KDA, damage, gold, and CS for each team</p>
+                  </div>
+                </div>
+
+                <div class="step">
+                  <div class="step-number">2</div>
+                  <div class="step-content">
+                    <h4>Feature Differences</h4>
+                    <p>Compute differential features: win_rate_diff, kda_diff, damage_diff, gold_diff, cs_diff</p>
+                  </div>
+                </div>
+
+                <div class="step">
+                  <div class="step-number">3</div>
+                  <div class="step-content">
+                    <h4>Random Forest Voting</h4>
+                    <p>200 decision trees analyze the features and vote on the winner</p>
+                  </div>
+                </div>
+
+                <div class="step">
+                  <div class="step-number">4</div>
+                  <div class="step-content">
+                    <h4>Final Prediction</h4>
+                    <p>
+                      <strong>{{ draftPrediction.prediction }}</strong> wins with
+                      <strong>{{ (draftPrediction.confidence * 100).toFixed(1) }}%</strong> confidence
+                      ({{ (draftPrediction.probabilities.blue_team * 100).toFixed(1) }}% Blue vs
+                      {{ (draftPrediction.probabilities.red_team * 100).toFixed(1) }}% Red)
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <h3>Key Insights</h3>
+              <ul class="insights-list">
+                <li *ngIf="draftPrediction.analysis.win_rate_advantage === draftPrediction.prediction.replace(' Team', '')">
+                  <strong>Win Rate Advantage:</strong> {{ draftPrediction.prediction }} has historically stronger champions
+                </li>
+                <li *ngIf="draftPrediction.analysis.damage_advantage === draftPrediction.prediction.replace(' Team', '')">
+                  <strong>Damage Advantage:</strong> {{ draftPrediction.prediction }} has higher damage output potential
+                </li>
+                <li>
+                  <strong>Confidence Level:</strong>
+                  <span *ngIf="draftPrediction.confidence >= 0.6">High confidence prediction ({{ (draftPrediction.confidence * 100).toFixed(1) }}%)</span>
+                  <span *ngIf="draftPrediction.confidence < 0.6 && draftPrediction.confidence >= 0.55">Moderate confidence ({{ (draftPrediction.confidence * 100).toFixed(1) }}%)</span>
+                  <span *ngIf="draftPrediction.confidence < 0.55">Low confidence - This is a close matchup! ({{ (draftPrediction.confidence * 100).toFixed(1) }}%)</span>
+                </li>
+                <li>
+                  <strong>Model Accuracy:</strong> 52.6% on test data (industry standard for pre-game draft prediction)
+                </li>
+              </ul>
+            </div>
+
+            <div class="detail-section note-section">
+              <h4>Note about Accuracy</h4>
+              <p>
+                Draft prediction is significantly harder than in-game prediction (52.6% vs 98.35%) because:
+              </p>
+              <ul>
+                <li>No in-game statistics available (gold, kills, towers)</li>
+                <li>Player skill levels vary greatly</li>
+                <li>Team synergy and strategy matter</li>
+                <li>Meta shifts affect champion strength</li>
+              </ul>
+              <p>
+                A 52.6% accuracy is <strong>better than random guessing (50%)</strong> and aligns with
+                professional draft analysis tools (55-65% accuracy).
+              </p>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button class="btn-primary" (click)="closeDetailsModal()">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading">
+    <p>Loading ML models...</p>
+  </div>
+</div>

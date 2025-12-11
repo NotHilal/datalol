@@ -1,0 +1,60 @@
+.matches-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.page-header {
+  margin-bottom: 30px;
+
+  h1 {
+    font-size: 36px;
+    color: #f0e6d2;
+    margin: 0 0 8px 0;
+    font-weight: 700;
+  }
+
+  .subtitle {
+    font-size: 16px;
+    color: #a09b8c;
+    margin: 0;
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  color: #a09b8c;
+
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #3c3c41;
+    border-top-color: #0097e6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.matches-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.no-data {
+  text-align: center;
+  padding: 60px 20px;
+  color: #a09b8c;
+  font-size: 18px;
+  font-style: italic;
+}

@@ -1,0 +1,62 @@
+<div class="match-card" [class.victory]="getWinningTeam()?.teamId === 100">
+  <div class="match-header">
+    <div class="match-info">
+      <span class="game-mode">{{ match.gameInfo.gameMode }}</span>
+      <span class="game-duration">{{ getGameDuration() }}</span>
+      <span class="game-date">{{ getGameDate() | date:'short' }}</span>
+    </div>
+    <div class="match-result">
+      <span class="result-badge" [class.victory]="getWinningTeam()?.teamId === 100">
+        {{ getWinningTeam()?.teamId === 100 ? 'VICTORY' : 'DEFEAT' }}
+      </span>
+    </div>
+  </div>
+
+  <div class="match-body">
+    <div class="team blue-team">
+      <div class="team-header">
+        <h4>Blue Side</h4>
+        <span class="team-result" [class.win]="getWinningTeam()?.teamId === 100">
+          {{ getWinningTeam()?.teamId === 100 ? 'WIN' : 'LOSS' }}
+        </span>
+      </div>
+      <div class="team-stats">
+        <div class="stat">
+          <span class="stat-label">Kills</span>
+          <span class="stat-value">{{ getTeamKills(100) }}</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Gold</span>
+          <span class="stat-value">{{ getTeamGold(100) / 1000 | number:'1.1-1' }}k</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="vs-divider">VS</div>
+
+    <div class="team red-team">
+      <div class="team-header">
+        <h4>Red Side</h4>
+        <span class="team-result" [class.win]="getWinningTeam()?.teamId === 200">
+          {{ getWinningTeam()?.teamId === 200 ? 'WIN' : 'LOSS' }}
+        </span>
+      </div>
+      <div class="team-stats">
+        <div class="stat">
+          <span class="stat-label">Kills</span>
+          <span class="stat-value">{{ getTeamKills(200) }}</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Gold</span>
+          <span class="stat-value">{{ getTeamGold(200) / 1000 | number:'1.1-1' }}k</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="match-footer">
+    <button class="btn-details" [routerLink]="['/matches', match.matchId]">
+      View Details
+    </button>
+  </div>
+</div>

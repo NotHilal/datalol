@@ -1,0 +1,90 @@
+<div class="statistics-page">
+  <div class="page-header">
+    <h1>Champion Statistics</h1>
+    <p class="subtitle">Comprehensive champion performance analytics</p>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading statistics...</p>
+  </div>
+
+  <div *ngIf="!loading" class="statistics-content">
+    <!-- Charts Section -->
+    <div class="charts-grid">
+      <div class="chart-card">
+        <app-chart
+          *ngIf="championWinRateData"
+          [type]="'bar'"
+          [data]="championWinRateData"
+          [title]="'Top 15 Champions - Win Rate'"
+          [options]="{scales: {y: {beginAtZero: true, max: 100}}}">
+        </app-chart>
+      </div>
+
+      <div class="chart-card">
+        <app-chart
+          *ngIf="championPickRateData"
+          [type]="'bar'"
+          [data]="championPickRateData"
+          [title]="'Top 15 Champions - Pick Rate (Total Games)'">
+        </app-chart>
+      </div>
+
+      <div class="chart-card">
+        <app-chart
+          *ngIf="championKDAData"
+          [type]="'bar'"
+          [data]="championKDAData"
+          [title]="'Top 15 Champions - Average KDA'"
+          [options]="{scales: {y: {beginAtZero: true}}}">
+        </app-chart>
+      </div>
+    </div>
+
+    <!-- Champion Stats Table -->
+    <div class="stats-table-container">
+      <h2>All Champion Statistics</h2>
+      <div class="table-wrapper">
+        <table class="stats-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Champion</th>
+              <th>Games</th>
+              <th>Wins</th>
+              <th>Win Rate</th>
+              <th>Avg K/D/A</th>
+              <th>Avg KDA</th>
+              <th>Avg Gold</th>
+              <th>Avg Damage</th>
+              <th>Avg CS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let champ of championStats; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td class="champion-name">{{ champ.champion }}</td>
+              <td>{{ champ.totalGames | number }}</td>
+              <td>{{ champ.wins | number }}</td>
+              <td class="win-rate" [class.high]="champ.winRate >= 52" [class.low]="champ.winRate < 48">
+                {{ champ.winRate | number:'1.1-1' }}%
+              </td>
+              <td class="kda-stats">
+                {{ champ.avgKills | number:'1.1-1' }} /
+                {{ champ.avgDeaths | number:'1.1-1' }} /
+                {{ champ.avgAssists | number:'1.1-1' }}
+              </td>
+              <td class="kda-ratio" [class.excellent]="champ.avgKDA >= 3" [class.good]="champ.avgKDA >= 2 && champ.avgKDA < 3">
+                {{ champ.avgKDA | number:'1.2-2' }}
+              </td>
+              <td>{{ champ.avgGold / 1000 | number:'1.1-1' }}k</td>
+              <td>{{ champ.avgDamage / 1000 | number:'1.1-1' }}k</td>
+              <td>{{ champ.avgCS | number:'1.1-1' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

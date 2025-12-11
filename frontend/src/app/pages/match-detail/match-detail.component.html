@@ -1,0 +1,130 @@
+<div class="match-detail-page">
+  <div class="page-header">
+    <button class="back-btn" (click)="goBack()">← Back</button>
+    <div class="header-info">
+      <h1>Match Details</h1>
+      <div class="match-meta">
+        <span class="game-mode">{{ match?.gameInfo.gameMode }}</span>
+        <span class="separator">•</span>
+        <span class="duration">{{ getGameDuration() }}</span>
+        <span class="separator">•</span>
+        <span class="date">{{ getGameDate() | date:'short' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading match details...</p>
+  </div>
+
+  <div *ngIf="!loading && match" class="match-content">
+
+    <!-- Teams Section -->
+    <div class="teams-section">
+      <!-- Blue Team -->
+      <div class="team-card blue-team" [class.victory]="getTeam(100)?.win">
+        <div class="team-header">
+          <h2>Blue Side</h2>
+          <div class="team-stats-summary">
+            <span class="team-result" [class.win]="getTeam(100)?.win">
+              {{ getTeam(100)?.win ? 'VICTORY' : 'DEFEAT' }}
+            </span>
+            <div class="objectives-quick">
+              <span title="Dragons">🐉 {{ getTeam(100)?.objectives.dragon.kills }}</span>
+              <span title="Barons">👑 {{ getTeam(100)?.objectives.baron.kills }}</span>
+              <span title="Towers">🗼 {{ getTeam(100)?.objectives.tower.kills }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="participants-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Champion</th>
+                <th>Player</th>
+                <th>K / D / A</th>
+                <th>KDA</th>
+                <th>Gold</th>
+                <th>Damage</th>
+                <th>CS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of getTeamParticipants(100)">
+                <td class="champion-cell">
+                  <span class="champion-name">{{ p.champion.name }}</span>
+                  <span class="champion-level">Lv{{ p.champion.level }}</span>
+                </td>
+                <td class="player-name">{{ p.summoner.riotIdGameName }}</td>
+                <td class="kda-stats">{{ p.kda.kills }} / {{ p.kda.deaths }} / {{ p.kda.assists }}</td>
+                <td class="kda-ratio" [ngClass]="getKDAClass(calculateKDA(p))">
+                  {{ calculateKDA(p) | number:'1.1-1' }}
+                </td>
+                <td class="gold-cell">{{ p.gold.earned / 1000 | number:'1.0-0' }}k</td>
+                <td class="damage-cell">{{ p.damage.totalDealtToChampions / 1000 | number:'1.0-0' }}k</td>
+                <td class="cs-cell">{{ p.farming.totalMinionsKilled }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Red Team -->
+      <div class="team-card red-team" [class.victory]="getTeam(200)?.win">
+        <div class="team-header">
+          <h2>Red Side</h2>
+          <div class="team-stats-summary">
+            <span class="team-result" [class.win]="getTeam(200)?.win">
+              {{ getTeam(200)?.win ? 'VICTORY' : 'DEFEAT' }}
+            </span>
+            <div class="objectives-quick">
+              <span title="Dragons">🐉 {{ getTeam(200)?.objectives.dragon.kills }}</span>
+              <span title="Barons">👑 {{ getTeam(200)?.objectives.baron.kills }}</span>
+              <span title="Towers">🗼 {{ getTeam(200)?.objectives.tower.kills }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="participants-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Champion</th>
+                <th>Player</th>
+                <th>K / D / A</th>
+                <th>KDA</th>
+                <th>Gold</th>
+                <th>Damage</th>
+                <th>CS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of getTeamParticipants(200)">
+                <td class="champion-cell">
+                  <span class="champion-name">{{ p.champion.name }}</span>
+                  <span class="champion-level">Lv{{ p.champion.level }}</span>
+                </td>
+                <td class="player-name">{{ p.summoner.riotIdGameName }}</td>
+                <td class="kda-stats">{{ p.kda.kills }} / {{ p.kda.deaths }} / {{ p.kda.assists }}</td>
+                <td class="kda-ratio" [ngClass]="getKDAClass(calculateKDA(p))">
+                  {{ calculateKDA(p) | number:'1.1-1' }}
+                </td>
+                <td class="gold-cell">{{ p.gold.earned / 1000 | number:'1.0-0' }}k</td>
+                <td class="damage-cell">{{ p.damage.totalDealtToChampions / 1000 | number:'1.0-0' }}k</td>
+                <td class="cs-cell">{{ p.farming.totalMinionsKilled }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !match" class="error-message">
+    <h2>Match not found</h2>
+    <p>The requested match could not be loaded.</p>
+    <button class="back-btn" (click)="goBack()">← Back to Matches</button>
+  </div>
+</div>
