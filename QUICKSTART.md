@@ -1,11 +1,24 @@
 # Quick Start Guide - League of Legends Analytics
 
+## 🚀 Setup on a New PC
+
+### Step 0: Clone the Repository
+
+```bash
+git clone https://github.com/NotHilal/datalol.git
+cd datalol
+```
+
+**⚠️ IMPORTANT:** The large data files are NOT included in the repository. You need to:
+1. Copy `matchData.csv` and `match_data.jsonl` from your original project into the `data/` folder
+2. Or skip to Step 2 and the data loader will fail - you'll need the original data files
+
 ## Prerequisites Check
-- ✅ Python 3.13.9 installed
-- ✅ Node.js v22.16.0 installed
-- ⚠️ MongoDB needs to be installed and running
-- ⚠️ Backend dependencies need to be installed
-- ⚠️ Frontend dependencies need to be installed
+- Python 3.8+ installed
+- Node.js 18+ installed
+- MongoDB needs to be installed and running
+- Backend dependencies need to be installed
+- Frontend dependencies need to be installed
 
 ---
 
@@ -33,11 +46,13 @@ mongosh --eval "db.version()"
 
 ## Step 2: Load Data into MongoDB
 
-```bash
-# Navigate to project root
-cd C:\Users\hilal\Downloads\archive(1)\league-of-legends-project
+**⚠️ Make sure you have copied the data files to the `data/` folder first!**
 
-# Run the data loader script
+```bash
+# From the project root directory (datalol)
+python scripts/load_to_mongodb.py
+
+# On Windows use:
 python scripts\load_to_mongodb.py
 ```
 

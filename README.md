@@ -101,9 +101,14 @@ league-of-legends-project/
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd league-of-legends-project
+git clone https://github.com/NotHilal/datalol.git
+cd datalol
 ```
+
+**Important Note:** The large data files (`matchData.csv` and `match_data.jsonl`) are not included in the repository due to GitHub's file size limits. You'll need to either:
+- Copy these files from your original project to the `data/` folder, or
+- Generate new data using the Riot API, or
+- Request the data files separately from the project maintainer
 
 ### 2. Backend Setup
 
