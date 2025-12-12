@@ -5,7 +5,7 @@ echo ================================================================
 echo.
 
 echo Checking Python...
-python --version 2>nul
+py --version 2>nul || python --version 2>nul
 if %errorlevel% neq 0 (
     echo ❌ Python not found in PATH
 ) else (
@@ -43,7 +43,7 @@ if %errorlevel% neq 0 (
 echo.
 echo Checking MongoDB data...
 if exist check_data.py (
-    python check_data.py
+    py check_data.py 2>nul || python check_data.py
 ) else (
     echo ⚠ check_data.py not found
 )

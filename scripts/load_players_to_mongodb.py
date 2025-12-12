@@ -13,7 +13,7 @@ DATABASE_NAME = "lol_matches"
 COLLECTION_NAME = "players"
 
 # File path
-CSV_FILE_PATH = r"C:\Users\hilal\OneDrive\Desktop\A5\league-of-legends-project\data\players_8-14-25.csv"
+CSV_FILE_PATH = r"C:\Users\hilal\Desktop\A5\Cloud Data Structure\datalol\data\players_8-14-25.csv"
 
 
 def connect_to_mongodb(uri, db_name, collection_name):

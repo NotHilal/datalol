@@ -18,7 +18,12 @@
       "Bash(git branch:*)",
       "Bash(git remote add:*)",
       "Bash(git push:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(test:*)",
+      "Bash(cmd.exe /c \"python --version\")",
+      "Bash(cmd.exe /c \"python test_data_path.py\")",
+      "Bash(py scriptsload_players_to_mongodb.py)",
+      "Bash(py scripts/load_players_to_mongodb.py)"
     ],
     "deny": [],
     "ask": []

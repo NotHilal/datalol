@@ -18,12 +18,17 @@ REM Install backend dependencies FIRST (needed for data loading)
 echo.
 echo [2/6] Installing backend dependencies...
 cd backend
-pip install -r requirements.txt
+py -m pip install -r requirements.txt
 if %errorlevel% neq 0 (
     echo ❌ Error installing backend dependencies.
-    echo Make sure Python and pip are installed and in your PATH.
-    pause
-    exit /b 1
+    echo Trying alternative Python command...
+    python -m pip install -r requirements.txt
+    if %errorlevel% neq 0 (
+        echo ❌ Error installing backend dependencies.
+        echo Make sure Python and pip are installed and in your PATH.
+        pause
+        exit /b 1
+    )
 )
 echo ✓ Backend dependencies installed (including tqdm, pandas, pymongo)
 cd ..
@@ -31,7 +36,7 @@ cd ..
 REM Check if data is loaded
 echo.
 echo [3/6] Checking if data is loaded...
-python check_data.py
+py check_data.py 2>nul || python check_data.py
 if %errorlevel% neq 0 (
     echo.
     echo Would you like to load the match data now? (This takes 10-15 minutes)
@@ -46,7 +51,7 @@ goto afterdata
 echo.
 echo Loading match data into MongoDB...
 echo This will take 10-15 minutes. Please wait...
-python scripts\load_to_mongodb.py
+py scripts\load_to_mongodb.py 2>nul || python scripts\load_to_mongodb.py
 if %errorlevel% neq 0 (
     echo ❌ Error loading data. Please check the error messages above.
     pause
@@ -73,7 +78,7 @@ cd ..
 
 echo.
 echo [5/6] Verifying setup...
-python check_data.py
+py check_data.py 2>nul || python check_data.py
 
 echo.
 echo [6/6] Setup complete!

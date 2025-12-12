@@ -17,7 +17,7 @@ echo.
 
 REM Start backend in new window
 echo Starting Backend Server...
-start "LoL Analytics - Backend" cmd /k "cd /d %~dp0backend && python run.py"
+start "LoL Analytics - Backend" cmd /k "cd /d %~dp0backend && (py run.py 2>nul || python run.py)"
 timeout /t 3 >nul
 
 REM Start frontend in new window

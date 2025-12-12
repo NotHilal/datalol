@@ -16,8 +16,10 @@ MONGO_URI = "mongodb://localhost:27017/"  # Change this to your MongoDB URI
 DATABASE_NAME = "lol_matches"
 COLLECTION_NAME = "matches"
 
-# File path - Update this to match your data location
-CSV_FILE_PATH = r"C:\Users\hilal\Downloads\archive(1)\league-of-legends-project\data\matchData.csv"
+# File path - Use relative path from project root
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(script_dir)
+CSV_FILE_PATH = os.path.join(project_root, "data", "matchData.csv")
 
 
 def connect_to_mongodb(uri, db_name, collection_name):
