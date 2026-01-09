@@ -51,6 +51,15 @@
       </a>
 
       <a
+        routerLink="/champions"
+        class="nav-link"
+        [class.active]="isActive('/champions')"
+        (click)="menuOpen = false">
+        <span class="nav-icon">⚔️</span>
+        <span>Champions</span>
+      </a>
+
+      <a
         routerLink="/ml"
         class="nav-link"
         [class.active]="isActive('/ml')"

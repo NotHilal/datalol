@@ -5,9 +5,34 @@ from flask import Blueprint, request, jsonify, current_app
 from app.models import Player
 from app.utils.response import success_response, error_response
 from app.utils.validators import validate_pagination
+from functools import wraps
 
 
 players_bp = Blueprint('players', __name__, url_prefix='/players')
+
+
+def cached(timeout=300):
+    """Cache decorator with dynamic key generation"""
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            # Generate cache key from function name and request args
+            cache_key = f"{f.__name__}:{request.full_path}"
+
+            # Try to get from cache
+            cached_data = current_app.cache.get(cache_key)
+            if cached_data is not None:
+                return cached_data
+
+            # Execute function
+            response = f(*args, **kwargs)
+
+            # Cache the response
+            current_app.cache.set(cache_key, response, timeout=timeout)
+
+            return response
+        return decorated_function
+    return decorator
 
 
 @players_bp.route('/', methods=['GET'])
@@ -83,6 +108,7 @@ def get_player(puuid):
 
 
 @players_bp.route('/leaderboard', methods=['GET'])
+@cached(timeout=300)  # Cache for 5 minutes - leaderboard is frequently accessed
 def get_leaderboard():
     """Get top players leaderboard"""
     try:
@@ -104,6 +130,7 @@ def get_leaderboard():
 
 
 @players_bp.route('/tier-distribution', methods=['GET'])
+@cached(timeout=1800)  # Cache for 30 minutes - tier distribution rarely changes
 def get_tier_distribution():
     """Get distribution of players across tiers"""
     try:

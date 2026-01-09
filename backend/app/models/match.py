@@ -14,15 +14,61 @@ class Match:
 
     def create_indexes(self):
         """Create indexes for optimized queries"""
+        print("[INFO] Creating Match collection indexes...")
+
+        # Unique index on matchId
         self.collection.create_index("matchId", unique=True)
+        print("  + matchId (unique)")
+
+        # Single field indexes
         self.collection.create_index("gameInfo.gameMode")
-        self.collection.create_index("timestamps.gameCreation")
+        self.collection.create_index([("timestamps.gameCreation", -1)])  # Descending for recent-first sorting
+        print("  + gameMode, timestamps")
+
+        # Player name index (for find_by_player queries)
         self.collection.create_index("participants.summoner.riotIdGameName")
+        print("  + player name")
+
+        # Champion name index (for find_by_champion queries)
         self.collection.create_index("participants.champion.name")
+        print("  + champion name")
+
+        # Compound index: Player + timestamp (for player match history sorted by date)
         self.collection.create_index([
-            ("participants.summoner.puuid", 1),
+            ("participants.summoner.riotIdGameName", 1),
             ("timestamps.gameCreation", -1)
         ])
+        print("  + player + timestamp (compound)")
+
+        # Compound index: Champion + timestamp (for champion match history)
+        self.collection.create_index([
+            ("participants.champion.name", 1),
+            ("timestamps.gameCreation", -1)
+        ])
+        print("  + champion + timestamp (compound)")
+
+        # Compound index: Champion + win status (for champion statistics aggregation)
+        self.collection.create_index([
+            ("participants.champion.name", 1),
+            ("participants.win", 1)
+        ])
+        print("  + champion + win (compound)")
+
+        # Compound index: Team + win (for team statistics)
+        self.collection.create_index([
+            ("teams.teamId", 1),
+            ("teams.win", 1)
+        ])
+        print("  + team + win (compound)")
+
+        # Index for game mode + timestamp (for filtered match lists)
+        self.collection.create_index([
+            ("gameInfo.gameMode", 1),
+            ("timestamps.gameCreation", -1)
+        ])
+        print("  + gameMode + timestamp (compound)")
+
+        print("[OK] All Match indexes created successfully")
 
     def find_by_id(self, match_id: str) -> Optional[Dict]:
         """Find match by matchId"""
@@ -31,10 +77,62 @@ class Match:
             match['_id'] = str(match['_id'])
         return match
 
-    def find_all(self, skip: int = 0, limit: int = 20, filters: Dict = None) -> List[Dict]:
+    def find_all(self, skip: int = 0, limit: int = 20, filters: Dict = None, projection: Dict = None) -> List[Dict]:
         """Find all matches with pagination and optional filters"""
         query = filters or {}
-        cursor = self.collection.find(query).skip(skip).limit(limit).sort("timestamps.gameCreation", -1)
+
+        # Use projection if provided to reduce data transfer
+        if projection:
+            cursor = self.collection.find(query, projection).skip(skip).limit(limit).sort("timestamps.gameCreation", -1)
+        else:
+            cursor = self.collection.find(query).skip(skip).limit(limit).sort("timestamps.gameCreation", -1)
+
+        matches = []
+        for match in cursor:
+            match['_id'] = str(match['_id'])
+            matches.append(match)
+
+        return matches
+
+    def find_all_lightweight(self, skip: int = 0, limit: int = 20, filters: Dict = None) -> List[Dict]:
+        """
+        Find matches with minimal fields for list view (lazy loading optimization)
+        Returns only essential fields for match cards, reducing data transfer by ~60-70%
+        """
+        query = filters or {}
+
+        # Only include essential fields for match list/card view
+        projection = {
+            '_id': 1,
+            'matchId': 1,
+            'gameInfo.gameMode': 1,
+            'gameInfo.gameDuration': 1,
+            'timestamps.gameCreation': 1,
+            'timestamps.gameEndTimestamp': 1,
+            'timestamps.gameDuration': 1,
+            # Team data
+            'teams.teamId': 1,
+            'teams.win': 1,
+            'teams.objectives.baron.kills': 1,
+            'teams.objectives.dragon.kills': 1,
+            'teams.objectives.tower.kills': 1,
+            # Participant data (needed for match cards)
+            'participants.summoner.riotIdGameName': 1,
+            'participants.champion.name': 1,
+            'participants.position.teamId': 1,
+            'participants.position.teamPosition': 1,  # Lane/Role (TOP, JUNGLE, etc.)
+            'participants.position.individualPosition': 1,
+            'participants.position.lane': 1,
+            'participants.position.role': 1,
+            'participants.teamId': 1,
+            'participants.win': 1,
+            'participants.kda.kills': 1,
+            'participants.kda.deaths': 1,
+            'participants.kda.assists': 1,
+            'participants.gold.earned': 1
+        }
+
+        cursor = self.collection.find(query, projection).skip(skip).limit(limit).sort("timestamps.gameCreation", -1)
 
         matches = []
         for match in cursor:
@@ -48,22 +146,31 @@ class Match:
         query = filters or {}
         return self.collection.count_documents(query)
 
-    def find_by_player(self, player_name: str, skip: int = 0, limit: int = 20) -> List[Dict]:
+    def find_by_player(self, player_name: str, skip: int = 0, limit: int = 20, lightweight: bool = False) -> List[Dict]:
         """Find matches by player name"""
         query = {
             "participants.summoner.riotIdGameName": player_name
         }
+        if lightweight:
+            return self.find_all_lightweight(skip, limit, query)
         return self.find_all(skip, limit, query)
 
-    def find_by_champion(self, champion_name: str, skip: int = 0, limit: int = 20) -> List[Dict]:
+    def find_by_champion(self, champion_name: str, skip: int = 0, limit: int = 20, lightweight: bool = False) -> List[Dict]:
         """Find matches by champion name"""
         query = {
             "participants.champion.name": champion_name
         }
+        if lightweight:
+            return self.find_all_lightweight(skip, limit, query)
         return self.find_all(skip, limit, query)
 
-    def aggregate_champion_stats(self, champion_name: Optional[str] = None) -> List[Dict]:
-        """Aggregate statistics by champion"""
+    def aggregate_champion_stats(self, champion_name: Optional[str] = None, limit: Optional[int] = None) -> List[Dict]:
+        """Aggregate statistics by champion
+
+        Args:
+            champion_name: Filter for specific champion (None = all champions)
+            limit: Limit results to top N champions (None = all champions)
+        """
         match_stage = {}
         if champion_name:
             match_stage = {"$match": {"participants.champion.name": champion_name}}
@@ -124,6 +231,10 @@ class Match:
             },
             {"$sort": {"totalGames": -1}}
         ])
+
+        # Add limit stage if specified (for dashboard top 10)
+        if limit:
+            pipeline.append({"$limit": limit})
 
         return list(self.collection.aggregate(pipeline))
 

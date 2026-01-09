@@ -30,39 +30,46 @@ export class DashboardComponent implements OnInit {
   loadDashboardData() {
     this.loading = true;
 
-    // Load overview statistics
+    // Load CRITICAL data first - overview statistics (blocks loading state)
     this.statisticsService.getOverviewStatistics().subscribe({
       next: (overviewStats: any) => {
         this.overviewStats = overviewStats;
+
+        // Use top champions from overview instead of fetching all champions
+        if (overviewStats.topChampions && overviewStats.topChampions.length > 0) {
+          this.championStats = overviewStats.topChampions.slice(0, 10);
+          this.prepareChampionCharts();
+        }
+
         this.prepareTeamSideChart();
         this.loading = false;
+
+        // Defer NON-CRITICAL data - load after page renders
+        this.loadDeferredData();
       },
       error: (error: any) => {
         console.error('Error loading overview:', error);
         this.loading = false;
+        this.loadDeferredData(); // Still load deferred data even if overview fails
       }
     });
+  }
 
-    // Load recent matches
-    this.matchService.getMatches(1, 5).subscribe({
-      next: (response: any) => {
-        this.recentMatches = response.items;
-      },
-      error: (error: any) => {
-        console.error('Error loading matches:', error);
-      }
-    });
+  private loadDeferredData() {
+    // Defer these calls by 100ms to prioritize initial render
+    setTimeout(() => {
+      // Load recent matches (lower priority)
+      this.matchService.getMatches(1, 5).subscribe({
+        next: (response: any) => {
+          this.recentMatches = response.items;
+        },
+        error: (error: any) => {
+          console.error('Error loading matches:', error);
+        }
+      });
 
-    // Load champion statistics
-    this.statisticsService.getChampionStatistics().subscribe({
-      next: (statistics: any) => {
-        this.championStats = statistics.slice(0, 10);
-        this.prepareChampionCharts();
-      },
-      error: (error: any) => {
-        console.error('Error loading champion stats:', error);
-      }
-    });
+      // Champion stats already loaded from overview - no need for separate call!
+    }, 100);
   }
 
   prepareTeamSideChart() {

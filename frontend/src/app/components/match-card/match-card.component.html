@@ -13,6 +13,7 @@
   </div>
 
   <div class="match-body">
+    <!-- Blue Team -->
     <div class="team blue-team">
       <div class="team-header">
         <h4>Blue Side</h4>
@@ -20,6 +21,8 @@
           {{ getWinningTeam()?.teamId === 100 ? 'WIN' : 'LOSS' }}
         </span>
       </div>
+
+      <!-- Team Stats -->
       <div class="team-stats">
         <div class="stat">
           <span class="stat-label">Kills</span>
@@ -30,10 +33,30 @@
           <span class="stat-value">{{ getTeamGold(100) / 1000 | number:'1.1-1' }}k</span>
         </div>
       </div>
+
+      <!-- Participants List -->
+      <div class="participants-list">
+        <div class="participant" *ngFor="let p of getTeamParticipants(100)">
+          <span class="position-icon"
+                [title]="p.position?.teamPosition || 'Unknown'">
+            {{ getPositionIcon(p.position?.teamPosition) }}
+          </span>
+          <span class="champion-name">{{ p.champion?.name }}</span>
+          <span class="role-badge"
+                [style.background-color]="getRoleColor(getChampionRole(p.champion?.name))"
+                [title]="getChampionRole(p.champion?.name)">
+            {{ getChampionRole(p.champion?.name) }}
+          </span>
+          <span class="kda">
+            {{ p.kda?.kills }}/{{ p.kda?.deaths }}/{{ p.kda?.assists }}
+          </span>
+        </div>
+      </div>
     </div>
 
     <div class="vs-divider">VS</div>
 
+    <!-- Red Team -->
     <div class="team red-team">
       <div class="team-header">
         <h4>Red Side</h4>
@@ -41,6 +64,8 @@
           {{ getWinningTeam()?.teamId === 200 ? 'WIN' : 'LOSS' }}
         </span>
       </div>
+
+      <!-- Team Stats -->
       <div class="team-stats">
         <div class="stat">
           <span class="stat-label">Kills</span>
@@ -49,6 +74,25 @@
         <div class="stat">
           <span class="stat-label">Gold</span>
           <span class="stat-value">{{ getTeamGold(200) / 1000 | number:'1.1-1' }}k</span>
+        </div>
+      </div>
+
+      <!-- Participants List -->
+      <div class="participants-list">
+        <div class="participant" *ngFor="let p of getTeamParticipants(200)">
+          <span class="position-icon"
+                [title]="p.position?.teamPosition || 'Unknown'">
+            {{ getPositionIcon(p.position?.teamPosition) }}
+          </span>
+          <span class="champion-name">{{ p.champion?.name }}</span>
+          <span class="role-badge"
+                [style.background-color]="getRoleColor(getChampionRole(p.champion?.name))"
+                [title]="getChampionRole(p.champion?.name)">
+            {{ getChampionRole(p.champion?.name) }}
+          </span>
+          <span class="kda">
+            {{ p.kda?.kills }}/{{ p.kda?.deaths }}/{{ p.kda?.assists }}
+          </span>
         </div>
       </div>
     </div>

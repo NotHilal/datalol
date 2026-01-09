@@ -34,10 +34,34 @@ class Player:
 
     def create_indexes(self):
         """Create indexes for optimized queries"""
+        print("[INFO] Creating Player collection indexes...")
+
+        # Unique index on puuid
         self.collection.create_index("puuid", unique=True)
+        print("  + puuid (unique)")
+
+        # Single field indexes
         self.collection.create_index("tier")
         self.collection.create_index("rank")
-        self.collection.create_index([("tier", 1), ("rank", 1)])
+        self.collection.create_index([("leaguePoints", -1)])  # Descending for top players
+        print("  + tier, rank, leaguePoints")
+
+        # Compound index: tier + rank + LP (for leaderboard sorting)
+        self.collection.create_index([
+            ("tier", 1),
+            ("rank", 1),
+            ("leaguePoints", -1)
+        ])
+        print("  + tier + rank + LP (compound)")
+
+        # Compound index: wins + losses (for games played sorting)
+        self.collection.create_index([
+            ("wins", -1),
+            ("losses", -1)
+        ])
+        print("  + wins + losses (compound)")
+
+        print("[OK] All Player indexes created successfully")
 
     def find_by_puuid(self, puuid: str) -> Optional[Dict]:
         """Find player by puuid"""

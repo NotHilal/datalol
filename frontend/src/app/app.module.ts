@@ -6,6 +6,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { SharedModule } from './shared/shared.module';
 
 // Services
 import { ApiService } from './services/api.service';
@@ -14,39 +15,17 @@ import { PlayerService } from './services/player.service';
 import { StatisticsService } from './services/statistics.service';
 import { MlService } from './services/ml.service';
 
-// Components
+// Core Components (always loaded)
 import { NavbarComponent } from './components/navbar/navbar.component';
-import { MatchCardComponent } from './components/match-card/match-card.component';
-import { PlayerStatsComponent } from './components/player-stats/player-stats.component';
-import { ChartComponent } from './components/chart/chart.component';
-import { PaginationComponent } from './components/pagination/pagination.component';
 
-// Pages
+// Dashboard (eagerly loaded - it's the landing page)
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
-import { MatchesComponent } from './pages/matches/matches.component';
-import { MatchDetailComponent } from './pages/match-detail/match-detail.component';
-import { PlayersComponent } from './pages/players/players.component';
-import { PlayerDetailComponent } from './pages/player-detail/player-detail.component';
-import { StatisticsComponent } from './pages/statistics/statistics.component';
-import { MlComponent } from './pages/ml/ml.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    // Components
     NavbarComponent,
-    MatchCardComponent,
-    PlayerStatsComponent,
-    ChartComponent,
-    PaginationComponent,
-    // Pages
-    DashboardComponent,
-    MatchesComponent,
-    MatchDetailComponent,
-    PlayersComponent,
-    PlayerDetailComponent,
-    StatisticsComponent,
-    MlComponent
+    DashboardComponent  // Only dashboard loaded upfront
   ],
   imports: [
     BrowserModule,
@@ -54,6 +33,7 @@ import { MlComponent } from './pages/ml/ml.component';
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
+    SharedModule,
     AppRoutingModule
   ],
   providers: [

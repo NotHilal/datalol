@@ -3,6 +3,8 @@ Flask application factory
 """
 from flask import Flask
 from flask_cors import CORS
+from flask_caching import Cache
+from flask_compress import Compress
 from pymongo import MongoClient
 from config import config
 import os
@@ -19,6 +21,29 @@ def create_app(config_name='default'):
     # Initialize CORS
     CORS(app, origins=app.config['CORS_ORIGINS'])
 
+    # Initialize Compression (gzip)
+    Compress(app)
+    print("[OK] Response compression enabled (gzip)")
+
+    # Initialize Cache with graceful fallback
+    cache = Cache()
+    try:
+        cache.init_app(app)
+        if app.config['CACHE_TYPE'] == 'redis':
+            # Test Redis connection
+            cache.get('test')
+            print(f"[OK] Cache initialized: Redis ({app.config['CACHE_REDIS_HOST']}:{app.config['CACHE_REDIS_PORT']})")
+        else:
+            print(f"[OK] Cache initialized: {app.config['CACHE_TYPE']}")
+    except Exception as e:
+        print(f"[WARNING] Redis unavailable, falling back to simple cache: {e}")
+        app.config['CACHE_TYPE'] = 'simple'
+        cache.init_app(app)
+        print("[OK] Cache initialized: simple (in-memory)")
+
+    # Make cache available to app
+    app.cache = cache
+
     # Initialize MongoDB
     mongo_client = MongoClient(app.config['MONGO_URI'])
     app.db = mongo_client[app.config['MONGO_DB_NAME']]
@@ -31,19 +56,22 @@ def create_app(config_name='default'):
         print(f"[ERROR] Failed to connect to MongoDB: {e}")
 
     # Create indexes
-    from app.models import Match, Player
+    from app.models import Match, Player, PlayerMatchIndex, ChampionMatchIndex
     Match(app.db).create_indexes()
     Player(app.db).create_indexes()
+    PlayerMatchIndex(app.db).create_indexes()
+    ChampionMatchIndex(app.db).create_indexes()
     print("[OK] Database indexes created")
 
     # Register blueprints
-    from app.routes import matches_bp, players_bp, statistics_bp
+    from app.routes import matches_bp, players_bp, statistics_bp, champions_bp
     from app.routes.ml import ml_bp
 
     api_prefix = app.config['API_PREFIX']
     app.register_blueprint(matches_bp, url_prefix=f'{api_prefix}/matches')
     app.register_blueprint(players_bp, url_prefix=f'{api_prefix}/players')
     app.register_blueprint(statistics_bp, url_prefix=f'{api_prefix}/statistics')
+    app.register_blueprint(champions_bp, url_prefix=f'{api_prefix}/champions')
     app.register_blueprint(ml_bp)
 
     # Health check route

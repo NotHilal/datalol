@@ -40,22 +40,25 @@ export class MatchDetailComponent implements OnInit {
   }
 
   getTeam(teamId: number) {
+    if (!this.match || !this.match.teams) return null;
     return this.match.teams.find((t: any) => t.teamId === teamId);
   }
 
   getTeamParticipants(teamId: number) {
+    if (!this.match || !this.match.participants) return [];
     return this.match.participants.filter((p: any) => p.position.teamId === teamId);
   }
 
   getGameDuration(): string {
-    if (!this.match) return '';
+    if (!this.match || !this.match.timestamps) return '';
     const duration = this.match.timestamps.gameDuration;
     const minutes = Math.floor(duration / 60);
     const seconds = duration % 60;
     return `${minutes}m ${seconds}s`;
   }
 
-  getGameDate(): Date {
+  getGameDate(): Date | null {
+    if (!this.match || !this.match.timestamps) return null;
     return new Date(this.match.timestamps.gameCreation);
   }
 

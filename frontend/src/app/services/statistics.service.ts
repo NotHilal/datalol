@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
 import { ApiService } from './api.service';
+import { CacheService } from './cache.service';
 import { ChampionStatistics, TeamStatistics, OverviewStatistics } from '../models/statistics.model';
 import { PlayerStatistics } from '../models/player.model';
 
@@ -9,7 +10,10 @@ import { PlayerStatistics } from '../models/player.model';
   providedIn: 'root'
 })
 export class StatisticsService {
-  constructor(private api: ApiService) {}
+  constructor(
+    private api: ApiService,
+    private cache: CacheService
+  ) {}
 
   getChampionStatistics(championName?: string): Observable<ChampionStatistics[]> {
     let params = new HttpParams();
@@ -17,26 +21,42 @@ export class StatisticsService {
       params = params.set('champion', championName);
     }
 
-    return this.api.get<any>('/statistics/champions', params).pipe(
+    const cacheKey = `stats:champions:${championName || 'all'}`;
+    const request$ = this.api.get<any>('/statistics/champions', params).pipe(
       map(response => response.data.statistics)
     );
+
+    // Cache for 10 minutes (matches backend cache)
+    return this.cache.wrap(cacheKey, request$, 600000);
   }
 
   getPlayerStatistics(playerName: string): Observable<PlayerStatistics> {
-    return this.api.get<any>(`/statistics/player/${playerName}`).pipe(
+    const cacheKey = `stats:player:${playerName}`;
+    const request$ = this.api.get<any>(`/statistics/player/${playerName}`).pipe(
       map(response => response.data.statistics)
     );
+
+    // Cache for 5 minutes
+    return this.cache.wrap(cacheKey, request$, 300000);
   }
 
   getTeamStatistics(): Observable<TeamStatistics[]> {
-    return this.api.get<any>('/statistics/teams').pipe(
+    const cacheKey = 'stats:teams';
+    const request$ = this.api.get<any>('/statistics/teams').pipe(
       map(response => response.data.statistics)
     );
+
+    // Cache for 30 minutes (team stats rarely change)
+    return this.cache.wrap(cacheKey, request$, 1800000);
   }
 
   getOverviewStatistics(): Observable<OverviewStatistics> {
-    return this.api.get<any>('/statistics/overview').pipe(
+    const cacheKey = 'stats:overview';
+    const request$ = this.api.get<any>('/statistics/overview').pipe(
       map(response => response.data.overview)
     );
+
+    // Cache for 10 minutes
+    return this.cache.wrap(cacheKey, request$, 600000);
   }
 }

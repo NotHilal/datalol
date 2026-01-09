@@ -1,0 +1,137 @@
+<div class="champions-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1>Champions</h1>
+      <p class="subtitle">Explore all League of Legends champions and their statistics</p>
+    </div>
+    <div class="header-right">
+      <button class="view-toggle" (click)="toggleViewMode()" [title]="'Switch to ' + (viewMode === 'grid' ? 'list' : 'grid') + ' view'">
+        {{ viewMode === 'grid' ? '☰' : '⊞' }}
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading champions...</p>
+  </div>
+
+  <div *ngIf="!loading" class="champions-content">
+    <!-- Filters and Search -->
+    <div class="filters-section">
+      <!-- Search Bar -->
+      <div class="search-bar">
+        <input
+          type="text"
+          placeholder="Search champions by name or role..."
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="onSearchChange($event)"
+          class="search-input">
+        <span class="search-icon">🔍</span>
+      </div>
+
+      <!-- Role Filters -->
+      <div class="filter-group">
+        <label>Filter by Role</label>
+        <div class="role-filters">
+          <button
+            *ngFor="let role of roles"
+            class="filter-btn"
+            [class.active]="selectedRole === role"
+            [style.border-color]="role !== 'All' ? championService.getRoleColor(role) : '#3c3c41'"
+            (click)="onRoleChange(role)">
+            <span *ngIf="role !== 'All'" class="role-dot" [style.background-color]="championService.getRoleColor(role)"></span>
+            {{ role }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Sort Options -->
+      <div class="sort-options">
+        <label>Sort by</label>
+        <div class="sort-buttons">
+          <button
+            class="sort-btn"
+            [class.active]="sortBy === 'name'"
+            (click)="onSortChange('name')">
+            Name {{ sortBy === 'name' ? (sortDirection === 'asc' ? '↑' : '↓') : '' }}
+          </button>
+          <button
+            class="sort-btn"
+            [class.active]="sortBy === 'games'"
+            (click)="onSortChange('games')">
+            Games {{ sortBy === 'games' ? (sortDirection === 'asc' ? '↑' : '↓') : '' }}
+          </button>
+          <button
+            class="sort-btn"
+            [class.active]="sortBy === 'winRate'"
+            (click)="onSortChange('winRate')">
+            Win Rate {{ sortBy === 'winRate' ? (sortDirection === 'asc' ? '↑' : '↓') : '' }}
+          </button>
+          <button
+            class="sort-btn"
+            [class.active]="sortBy === 'kda'"
+            (click)="onSortChange('kda')">
+            KDA {{ sortBy === 'kda' ? (sortDirection === 'asc' ? '↑' : '↓') : '' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Results Summary -->
+      <div class="results-summary">
+        <span class="results-count">{{ filteredChampions.length }} champions</span>
+        <button class="clear-btn" (click)="clearFilters()" *ngIf="searchQuery || selectedRole !== 'All'">
+          Clear Filters
+        </button>
+      </div>
+    </div>
+
+    <!-- Champions Grid/List -->
+    <div class="champions-container" [class.grid-view]="viewMode === 'grid'" [class.list-view]="viewMode === 'list'">
+      <div class="champion-card" *ngFor="let champion of filteredChampions" (click)="viewChampion(champion.name)">
+        <div class="champion-header">
+          <h3 class="champion-name">{{ champion.name }}</h3>
+          <span class="role-badge" [style.background-color]="champion.roleColor">
+            {{ champion.role }}
+          </span>
+        </div>
+
+        <div class="champion-stats" *ngIf="champion.stats">
+          <div class="stat-item">
+            <span class="stat-label">Games</span>
+            <span class="stat-value">{{ champion.stats.totalGames | number }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Win Rate</span>
+            <span class="stat-value" [class.high]="champion.stats.winRate >= 52" [class.low]="champion.stats.winRate < 48">
+              {{ champion.stats.winRate | number:'1.1-1' }}%
+            </span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Avg KDA</span>
+            <span class="stat-value" [class.excellent]="champion.stats.avgKDA >= 3">
+              {{ champion.stats.avgKDA | number:'1.2-2' }}
+            </span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Avg Gold</span>
+            <span class="stat-value">{{ champion.stats.avgGold / 1000 | number:'1.1-1' }}k</span>
+          </div>
+        </div>
+
+        <div class="champion-stats no-data" *ngIf="!champion.stats">
+          <p class="no-stats-message">No match data available</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="filteredChampions.length === 0">
+      <div class="empty-icon">🔍</div>
+      <h3>No champions found</h3>
+      <p>Try adjusting your search or filters</p>
+      <button class="clear-btn" (click)="clearFilters()">Clear Filters</button>
+    </div>
+  </div>
+</div>

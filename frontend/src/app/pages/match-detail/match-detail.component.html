@@ -3,12 +3,12 @@
     <button class="back-btn" (click)="goBack()">← Back</button>
     <div class="header-info">
       <h1>Match Details</h1>
-      <div class="match-meta">
-        <span class="game-mode">{{ match?.gameInfo.gameMode }}</span>
+      <div class="match-meta" *ngIf="match">
+        <span class="game-mode">{{ match?.gameInfo?.gameMode }}</span>
         <span class="separator">•</span>
         <span class="duration">{{ getGameDuration() }}</span>
         <span class="separator">•</span>
-        <span class="date">{{ getGameDate() | date:'short' }}</span>
+        <span class="date" *ngIf="getGameDate()">{{ getGameDate() | date:'short' }}</span>
       </div>
     </div>
   </div>
@@ -69,6 +69,12 @@
             </tbody>
           </table>
         </div>
+
+        <!-- Team Composition Analysis -->
+        <app-team-composition
+          [participants]="getTeamParticipants(100)"
+          [teamName]="'Blue Side'">
+        </app-team-composition>
       </div>
 
       <!-- Red Team -->
@@ -118,6 +124,12 @@
             </tbody>
           </table>
         </div>
+
+        <!-- Team Composition Analysis -->
+        <app-team-composition
+          [participants]="getTeamParticipants(200)"
+          [teamName]="'Red Side'">
+        </app-team-composition>
       </div>
     </div>
   </div>

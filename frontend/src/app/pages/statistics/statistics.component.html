@@ -10,6 +10,64 @@
   </div>
 
   <div *ngIf="!loading" class="statistics-content">
+    <!-- Filters Section -->
+    <div class="filters-section">
+      <div class="filters-header">
+        <h3>Filters</h3>
+        <button class="clear-btn" (click)="clearFilters()" *ngIf="selectedRole !== 'All' || selectedPosition !== 'All'">
+          Clear All
+        </button>
+      </div>
+
+      <div class="filters-grid">
+        <!-- Role Filter -->
+        <div class="filter-group">
+          <label>Champion Role</label>
+          <div class="role-filters">
+            <button
+              *ngFor="let role of roles"
+              class="filter-btn"
+              [class.active]="selectedRole === role"
+              [style.border-color]="role !== 'All' ? getRoleColor(role) : '#3c3c41'"
+              (click)="onRoleChange(role)">
+              <span *ngIf="role !== 'All'" class="role-dot" [style.background-color]="getRoleColor(role)"></span>
+              {{ role }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Position Filter (Optional - uncomment when position stats are available) -->
+        <!--
+        <div class="filter-group">
+          <label>Lane Position</label>
+          <div class="position-filters">
+            <button
+              *ngFor="let position of positions"
+              class="filter-btn"
+              [class.active]="selectedPosition === position"
+              (click)="onPositionChange(position)">
+              <span *ngIf="position !== 'All'" class="position-icon">
+                {{ championService.getPositionIcon(position) }}
+              </span>
+              {{ position }}
+            </button>
+          </div>
+        </div>
+        -->
+      </div>
+
+      <!-- Results Summary -->
+      <div class="results-summary">
+        <span class="results-count">{{ championStats.length }} champions</span>
+        <span *ngIf="selectedRole !== 'All'" class="active-filter">
+          Role: <strong>{{ selectedRole }}</strong>
+        </span>
+        <span *ngIf="selectedPosition !== 'All'" class="active-filter">
+          Position: <strong>{{ selectedPosition }}</strong>
+        </span>
+      </div>
+    </div>
+
     <!-- Charts Section -->
     <div class="charts-grid">
       <div class="chart-card">
@@ -51,6 +109,7 @@
             <tr>
               <th>#</th>
               <th>Champion</th>
+              <th>Role</th>
               <th>Games</th>
               <th>Wins</th>
               <th>Win Rate</th>
@@ -65,6 +124,11 @@
             <tr *ngFor="let champ of championStats; let i = index">
               <td>{{ i + 1 }}</td>
               <td class="champion-name">{{ champ.champion }}</td>
+              <td>
+                <span class="role-badge" [style.background-color]="getRoleColor(champ.role)">
+                  {{ champ.role }}
+                </span>
+              </td>
               <td>{{ champ.totalGames | number }}</td>
               <td>{{ champ.wins | number }}</td>
               <td class="win-rate" [class.high]="champ.winRate >= 52" [class.low]="champ.winRate < 48">

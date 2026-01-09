@@ -1,0 +1,99 @@
+<div class="team-composition" *ngIf="composition">
+  <!-- Header -->
+  <div class="composition-header">
+    <h3>{{ teamName }} Composition</h3>
+    <div class="diversity-score" [style.border-color]="getScoreColor()">
+      <span class="score-value" [style.color]="getScoreColor()">{{ composition.diversityScore }}</span>
+      <span class="score-label">{{ getScoreLabel() }}</span>
+    </div>
+  </div>
+
+  <!-- Role Breakdown -->
+  <div class="role-breakdown">
+    <h4>Role Distribution</h4>
+    <div class="roles-grid">
+      <div class="role-item" *ngFor="let rc of composition.roleCounts">
+        <div class="role-header">
+          <div class="role-badge" [style.background-color]="rc.color">
+            {{ rc.role }}
+          </div>
+          <span class="role-count">×{{ rc.count }}</span>
+        </div>
+        <div class="role-champions">
+          <span class="champion-name" *ngFor="let champ of rc.champions">
+            {{ champ }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Damage Balance -->
+  <div class="damage-balance">
+    <h4>Damage Type Balance</h4>
+    <div class="damage-bar">
+      <div class="damage-segment physical"
+           [style.width.%]="composition.damageBalance.physical"
+           [title]="'Physical: ' + composition.damageBalance.physical + '%'">
+        <span *ngIf="composition.damageBalance.physical > 15">
+          {{ composition.damageBalance.physical }}%
+        </span>
+      </div>
+      <div class="damage-segment magic"
+           [style.width.%]="composition.damageBalance.magic"
+           [title]="'Magic: ' + composition.damageBalance.magic + '%'">
+        <span *ngIf="composition.damageBalance.magic > 15">
+          {{ composition.damageBalance.magic }}%
+        </span>
+      </div>
+      <div class="damage-segment mixed"
+           [style.width.%]="composition.damageBalance.mixed"
+           [title]="'Mixed: ' + composition.damageBalance.mixed + '%'">
+        <span *ngIf="composition.damageBalance.mixed > 15">
+          {{ composition.damageBalance.mixed }}%
+        </span>
+      </div>
+    </div>
+    <div class="damage-legend">
+      <div class="legend-item">
+        <div class="legend-color physical"></div>
+        <span>Physical ({{ composition.damageBalance.physical }}%)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color magic"></div>
+        <span>Magic ({{ composition.damageBalance.magic }}%)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color mixed"></div>
+        <span>Mixed ({{ composition.damageBalance.mixed }}%)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Composition Indicators -->
+  <div class="composition-indicators">
+    <div class="indicator" [class.present]="composition.hasTank" [class.missing]="!composition.hasTank">
+      <span class="indicator-icon">{{ composition.hasTank ? '✓' : '✗' }}</span>
+      <span class="indicator-label">Tank</span>
+    </div>
+    <div class="indicator" [class.present]="composition.hasSupport" [class.missing]="!composition.hasSupport">
+      <span class="indicator-icon">{{ composition.hasSupport ? '✓' : '✗' }}</span>
+      <span class="indicator-label">Support</span>
+    </div>
+    <div class="indicator" [class.present]="composition.balanced" [class.missing]="!composition.balanced">
+      <span class="indicator-icon">{{ composition.balanced ? '✓' : '✗' }}</span>
+      <span class="indicator-label">Balanced</span>
+    </div>
+  </div>
+
+  <!-- Warnings -->
+  <div class="warnings" *ngIf="composition.warnings.length > 0">
+    <h4>Composition Analysis</h4>
+    <div class="warning-list">
+      <div class="warning-item" *ngFor="let warning of composition.warnings">
+        <span class="warning-icon">⚠️</span>
+        <span class="warning-text">{{ warning }}</span>
+      </div>
+    </div>
+  </div>
+</div>
