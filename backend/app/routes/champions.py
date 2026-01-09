@@ -36,9 +36,9 @@ def get_champion_roles():
     """
     try:
         # Import here to avoid circular imports
-        from ml_models.draft_prediction import DraftPredictor
+        from ml_models.draft_prediction import ChampionDraftPredictor
 
-        predictor = DraftPredictor()
+        predictor = ChampionDraftPredictor()
         champion_roles = predictor.champion_roles
 
         # Also return role descriptions
@@ -102,8 +102,8 @@ def get_all_champion_stats():
         champion_stats = match_model.aggregate_champion_stats()
 
         # Import role mapping
-        from ml_models.draft_prediction import DraftPredictor
-        predictor = DraftPredictor()
+        from ml_models.draft_prediction import ChampionDraftPredictor
+        predictor = ChampionDraftPredictor()
 
         # Enhance with role information
         for stat in champion_stats:
