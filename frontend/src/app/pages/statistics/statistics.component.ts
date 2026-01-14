@@ -78,6 +78,9 @@ export class StatisticsComponent implements OnInit {
       filtered = filtered.filter(stat => stat.position === this.selectedPosition);
     }
 
+    // Sort alphabetically by champion name for the table
+    filtered.sort((a, b) => a.champion.localeCompare(b.champion));
+
     this.championStats = filtered;
     this.prepareCharts();
   }

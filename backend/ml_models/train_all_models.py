@@ -15,6 +15,7 @@ from ml_models.data_preprocessor import DataPreprocessor
 from ml_models.match_prediction import MatchOutcomePredictor
 from ml_models.champion_clustering import ChampionClusterer
 from ml_models.duration_prediction import GameDurationPredictor
+from ml_models.draft_prediction import ChampionDraftPredictor
 
 
 def print_section_header(title):
@@ -178,11 +179,37 @@ def generate_markdown_report(results: dict, filepath: str = 'ml_results/ML_REPOR
 
         f.write("---\n\n")
 
+        # Draft Prediction
+        f.write("## 4. Draft Prediction - Pre-Game (Classification)\n\n")
+        f.write("### Model: XGBoost Classifier\n\n")
+        f.write("**Objective:** Predict match outcome based on champion picks before the game starts.\n\n")
+
+        if 'draft_prediction' in results:
+            draft = results['draft_prediction']
+            f.write("### Performance Metrics\n\n")
+            f.write("| Metric | Score |\n")
+            f.write("|--------|-------|\n")
+            f.write(f"| Test Accuracy | {draft.get('test_accuracy', 0):.4f} |\n")
+            f.write(f"| Precision | {draft.get('precision', 0):.4f} |\n")
+            f.write(f"| Recall | {draft.get('recall', 0):.4f} |\n")
+            f.write(f"| F1-Score | {draft.get('f1_score', 0):.4f} |\n")
+            f.write(f"| ROC-AUC | {draft.get('roc_auc', 0):.4f} |\n")
+            f.write(f"| Cross-Validation Accuracy | {draft.get('cv_accuracy', 0):.4f} (+/- {draft.get('cv_std', 0):.4f}) |\n\n")
+
+            f.write("**Note:** Draft prediction is significantly harder than in-game prediction because:\n")
+            f.write("- No in-game statistics available (gold, kills, towers)\n")
+            f.write("- Player skill levels vary greatly\n")
+            f.write("- Team synergy and strategy matter\n")
+            f.write("- Meta shifts affect champion strength\n\n")
+
+        f.write("---\n\n")
+
         f.write("## Summary\n\n")
-        f.write("This project successfully implemented three machine learning models:\n\n")
-        f.write("1. **Classification Model:** Accurately predicts match outcomes with high precision\n")
-        f.write("2. **Clustering Model:** Identifies distinct champion playstyle archetypes\n")
-        f.write("3. **Regression Model:** Predicts game duration with reasonable accuracy\n\n")
+        f.write("This project successfully implemented four machine learning models:\n\n")
+        f.write("1. **Match Outcome Prediction:** Accurately predicts match outcomes with high precision (98%+)\n")
+        f.write("2. **Champion Clustering:** Identifies distinct champion playstyle archetypes\n")
+        f.write("3. **Game Duration Prediction:** Predicts game duration with reasonable accuracy\n")
+        f.write("4. **Draft Prediction:** Predicts winners based on champion picks before game starts\n\n")
         f.write("All models were evaluated using appropriate metrics and visualizations.\n")
 
     print(f"Markdown report saved to {filepath}")
@@ -305,6 +332,35 @@ def main():
 
     except Exception as e:
         print(f"\n[ERROR] Error in Game Duration Prediction: {e}")
+        import traceback
+        traceback.print_exc()
+
+    # ========================================================================
+    # 4. DRAFT PREDICTION (PRE-GAME)
+    # ========================================================================
+    print_section_header("MODEL 4: DRAFT PREDICTION (PRE-GAME)")
+
+    try:
+        # Initialize and train draft predictor
+        print("Step 1: Initializing draft predictor...")
+        draft_predictor = ChampionDraftPredictor()
+
+        print("\nStep 2: Training draft prediction model...")
+        print("Note: This may take several minutes as it analyzes champion synergies...")
+        draft_results = draft_predictor.train(limit=None, tune_hyperparameters=False)
+
+        # Save model
+        print("\nStep 3: Saving model...")
+        draft_predictor.save_model()
+
+        # Extract and save metrics
+        draft_metrics = draft_results['metrics']
+        results['draft_prediction'] = draft_metrics
+
+        print("\n[SUCCESS] Draft Prediction completed successfully!")
+
+    except Exception as e:
+        print(f"\n[ERROR] Error in Draft Prediction: {e}")
         import traceback
         traceback.print_exc()
 

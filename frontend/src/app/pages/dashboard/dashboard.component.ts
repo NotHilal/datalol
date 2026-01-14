@@ -12,6 +12,7 @@ export class DashboardComponent implements OnInit {
   overviewStats: any = null;
   recentMatches: any[] = [];
   championStats: any[] = [];
+  totalChampions = 0;
 
   // Chart data
   winRateChartData: any;
@@ -40,6 +41,9 @@ export class DashboardComponent implements OnInit {
           this.championStats = overviewStats.topChampions.slice(0, 10);
           this.prepareChampionCharts();
         }
+
+        // Store total champion count
+        this.totalChampions = overviewStats.totalChampions || 0;
 
         this.prepareTeamSideChart();
         this.loading = false;

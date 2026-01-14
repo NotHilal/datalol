@@ -23,23 +23,30 @@ class DataPreprocessor:
         self.db = self.client['lol_matches']
         self.matches_collection = self.db['matches']
 
-    def extract_match_features(self, limit: int = None) -> pd.DataFrame:
+    def extract_match_features(self, limit: int = None, random_sample: bool = True) -> pd.DataFrame:
         """
         Extract features for match outcome prediction
 
         Args:
             limit: Maximum number of matches to extract (None for all)
+            random_sample: If True, uses random sampling instead of sequential order
 
         Returns:
             DataFrame with match features and outcomes
         """
         print("Extracting match features from MongoDB...")
 
-        query = {}
-        cursor = self.matches_collection.find(query)
-
-        if limit:
-            cursor = cursor.limit(limit)
+        # Use random sampling for better diversity of matches (easy + hard predictions)
+        if limit and random_sample:
+            # Use MongoDB aggregation with $sample for true random sampling
+            cursor = self.matches_collection.aggregate([
+                {'$sample': {'size': limit}}
+            ])
+        else:
+            query = {}
+            cursor = self.matches_collection.find(query)
+            if limit:
+                cursor = cursor.limit(limit)
 
         data = []
 
@@ -217,12 +224,13 @@ class DataPreprocessor:
         print(f"Extracted statistics for {len(df)} champions")
         return df
 
-    def extract_duration_features(self, limit: int = None) -> pd.DataFrame:
+    def extract_duration_features(self, limit: int = None, random_sample: bool = True) -> pd.DataFrame:
         """
         Extract features for game duration prediction
 
         Args:
             limit: Maximum number of matches to extract
+            random_sample: If True, uses random sampling
 
         Returns:
             DataFrame with features and game durations
@@ -230,7 +238,7 @@ class DataPreprocessor:
         print("Extracting features for duration prediction...")
 
         # Reuse match features and add more relevant features
-        df = self.extract_match_features(limit=limit)
+        df = self.extract_match_features(limit=limit, random_sample=random_sample)
 
         # Calculate per-minute statistics
         df['blue_gold_per_min'] = df['blue_gold'] / (df['gameDuration'] / 60)

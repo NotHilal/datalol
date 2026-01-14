@@ -40,86 +40,115 @@
 
   <!-- Overview Tab -->
   <div *ngIf="selectedTab === 'overview'" class="tab-content">
-    <div class="models-grid">
-      <div *ngFor="let model of models" class="model-card">
-        <div class="model-header">
-          <h3>{{ model.name }}</h3>
-          <span class="model-type">{{ model.type }}</span>
+    <!-- Hero Stats Section -->
+    <div class="overview-hero">
+      <div class="hero-stat">
+        <div class="hero-icon">🎯</div>
+        <div class="hero-content">
+          <div class="hero-label">Models Trained</div>
+          <div class="hero-value">{{ models.length }}</div>
         </div>
-        <p class="model-description">{{ model.description }}</p>
-        <div class="model-details">
-          <div class="detail">
-            <span class="label">Algorithm:</span>
-            <span class="value">{{ model.algorithm }}</span>
-          </div>
-          <div class="detail" *ngIf="model.accuracy">
-            <span class="label">Accuracy:</span>
-            <span class="value">{{ (model.accuracy * 100).toFixed(2) }}%</span>
-          </div>
-          <div class="detail" *ngIf="model.rmse">
-            <span class="label">RMSE:</span>
-            <span class="value">{{ model.rmse.toFixed(2) }} min</span>
-          </div>
-          <div class="detail" *ngIf="model.clusters">
-            <span class="label">Clusters:</span>
-            <span class="value">{{ model.clusters }}</span>
-          </div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-icon">📊</div>
+        <div class="hero-content">
+          <div class="hero-label">Training Data</div>
+          <div class="hero-value">101K+</div>
+          <div class="hero-sublabel">matches analyzed</div>
         </div>
-        <div class="model-status" [class.available]="model.available">
-          {{ model.available ? 'Available' : 'Not Available' }}
+      </div>
+      <div class="hero-stat" *ngIf="samplePredictions">
+        <div class="hero-icon">✓</div>
+        <div class="hero-content">
+          <div class="hero-label">Live Accuracy</div>
+          <div class="hero-value">{{ (samplePredictions.match_accuracy * 100).toFixed(0) }}%</div>
+          <div class="hero-sublabel">on test data</div>
         </div>
       </div>
     </div>
 
-    <!-- Sample Predictions -->
-    <div *ngIf="samplePredictions" class="sample-predictions">
-      <h2>Model Performance on Sample Data</h2>
-
-      <div class="performance-metrics">
-        <div class="metric-card">
-          <h4>Match Prediction Accuracy</h4>
-          <div class="metric-value" [ngClass]="getAccuracyClass(samplePredictions.match_accuracy)">
-            {{ (samplePredictions.match_accuracy * 100).toFixed(1) }}%
-          </div>
-          <p>{{ samplePredictions.match_predictions.length }} test matches</p>
+    <!-- Models Grid - Simplified -->
+    <h2 class="section-title">Available Models</h2>
+    <div class="models-grid-clean">
+      <div *ngFor="let model of models" class="model-card-clean">
+        <div class="model-icon">
+          <span *ngIf="model.type === 'Classification'">🎯</span>
+          <span *ngIf="model.type === 'Regression'">📈</span>
+          <span *ngIf="model.type === 'Unsupervised Learning'">🔍</span>
         </div>
-        <div class="metric-card">
-          <h4>Duration Prediction Error</h4>
-          <div class="metric-value">
-            ±{{ samplePredictions.avg_duration_error.toFixed(2) }} min
+        <h3>{{ model.name }}</h3>
+        <p class="model-desc">{{ model.description }}</p>
+
+        <div class="model-metric">
+          <div class="metric-label">{{ model.algorithm }}</div>
+          <div class="metric-main" *ngIf="model.accuracy">
+            <span class="metric-number">{{ (model.accuracy * 100).toFixed(1) }}%</span>
+            <span class="metric-text">accuracy</span>
           </div>
-          <p>Average error across {{ samplePredictions.duration_predictions.length }} matches</p>
+          <div class="metric-main" *ngIf="model.rmse">
+            <span class="metric-number">±{{ model.rmse.toFixed(1) }}</span>
+            <span class="metric-text">min error</span>
+          </div>
+          <div class="metric-main" *ngIf="model.clusters">
+            <span class="metric-number">{{ model.clusters }}</span>
+            <span class="metric-text">archetypes</span>
+          </div>
+        </div>
+
+        <div class="model-badge" [class.active]="model.available">
+          <span *ngIf="model.available">● Ready</span>
+          <span *ngIf="!model.available">○ Unavailable</span>
         </div>
       </div>
+    </div>
 
-      <div class="prediction-samples">
-        <h3>Sample Match Predictions</h3>
-        <table class="predictions-table">
-          <thead>
-            <tr>
-              <th>Match ID</th>
-              <th>Predicted</th>
-              <th>Actual</th>
-              <th>Confidence</th>
-              <th>Result</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let pred of samplePredictions.match_predictions">
-              <td>{{ pred.matchId.substring(0, 12) }}...</td>
-              <td>{{ pred.predicted_winner }}</td>
-              <td>{{ pred.actual_winner }}</td>
-              <td [ngClass]="getConfidenceClass(pred.confidence)">
-                {{ (pred.confidence * 100).toFixed(1) }}%
-              </td>
-              <td>
-                <span class="result-badge" [class.correct]="pred.correct">
-                  {{ pred.correct ? '✓ Correct' : '✗ Wrong' }}
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <!-- Loading indicator for sample predictions -->
+    <div *ngIf="!samplePredictions" class="loading-predictions">
+      <div class="loading-spinner"></div>
+      <p>Running live predictions on test matches...</p>
+    </div>
+
+    <!-- Quick Performance Summary -->
+    <div *ngIf="samplePredictions" class="performance-summary">
+      <h2 class="section-title">Live Performance Test</h2>
+      <p class="performance-note">
+        Testing on <strong>{{ samplePredictions.match_predictions.length }} randomly selected matches</strong> from the database to ensure diverse prediction scenarios.
+      </p>
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="summary-header">
+            <span class="summary-icon">⚡</span>
+            <h3>Match Prediction</h3>
+          </div>
+          <div class="summary-stat">
+            <div class="stat-big">{{ (samplePredictions.match_accuracy * 100).toFixed(0) }}%</div>
+            <div class="stat-label">Correct predictions on {{ samplePredictions.match_predictions.length }} test matches</div>
+          </div>
+          <div class="summary-details">
+            <span class="detail-item">
+              <span class="detail-icon">✓</span>
+              {{ getCorrectPredictionsCount() }} correct
+            </span>
+            <span class="detail-item">
+              <span class="detail-icon">✗</span>
+              {{ getIncorrectPredictionsCount() }} incorrect
+            </span>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-header">
+            <span class="summary-icon">⏱️</span>
+            <h3>Duration Prediction</h3>
+          </div>
+          <div class="summary-stat">
+            <div class="stat-big">±{{ samplePredictions.avg_duration_error.toFixed(1) }} min</div>
+            <div class="stat-label">Average error on {{ samplePredictions.duration_predictions.length }} matches</div>
+          </div>
+          <div class="summary-note">
+            Predicts game length within {{ (samplePredictions.avg_duration_error * 60).toFixed(0) }} seconds on average
+          </div>
+        </div>
       </div>
     </div>
   </div>

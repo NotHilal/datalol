@@ -122,17 +122,17 @@ def get_models_info():
                     'name': 'Draft Prediction (Pre-game)',
                     'type': 'Classification',
                     'algorithm': 'XGBoost (Enhanced)',
-                    'accuracy': 0.656,
-                    'roc_auc': 0.7118,
+                    'accuracy': results.get('draft_prediction', {}).get('test_accuracy', 0),
+                    'roc_auc': results.get('draft_prediction', {}).get('roc_auc', 0),
                     'description': 'Predicts match outcome based on champion picks before the game starts',
                     'available': os.path.exists(os.path.join(backend_dir, 'ml_models/saved_models/draft_predictor.pkl')),
                     'details': {
                         'training_data': '101,838 complete match drafts',
                         'features': 53,
                         'champion_synergies': '14,323 champion pair combinations analyzed',
-                        'test_accuracy': '65.6%',
-                        'cross_validation': '64.4% (±0.3%)',
-                        'improvement': '+13% from baseline',
+                        'test_accuracy': f"{results.get('draft_prediction', {}).get('test_accuracy', 0):.1%}" if results.get('draft_prediction') else 'Not trained',
+                        'cross_validation': f"{results.get('draft_prediction', {}).get('cv_accuracy', 0):.1%} (±{results.get('draft_prediction', {}).get('cv_std', 0):.1%})" if results.get('draft_prediction') else 'Not available',
+                        'improvement': f"+{((results.get('draft_prediction', {}).get('test_accuracy', 0.5) - 0.5) / 0.5 * 100):.0f}% from baseline" if results.get('draft_prediction') else 'Not calculated',
                         'how_it_works': {
                             'overview': 'This enhanced model uses a hybrid approach combining individual champion statistics, team composition balance, and champion synergies to predict match outcomes before the game begins.',
                             'key_features': [
@@ -169,10 +169,10 @@ def get_models_info():
                             'most_important_insight': 'Champion synergy (how well champions work together) is far more important than individual champion strength. A team of strong champions with poor synergy will lose to a balanced team with good champion combinations.'
                         },
                         'performance_metrics': {
-                            'precision': '65.4%',
-                            'recall': '67.5%',
-                            'f1_score': '66.5%',
-                            'roc_auc': '71.2%'
+                            'precision': f"{results.get('draft_prediction', {}).get('precision', 0):.1%}" if results.get('draft_prediction') else 'Not available',
+                            'recall': f"{results.get('draft_prediction', {}).get('recall', 0):.1%}" if results.get('draft_prediction') else 'Not available',
+                            'f1_score': f"{results.get('draft_prediction', {}).get('f1_score', 0):.1%}" if results.get('draft_prediction') else 'Not available',
+                            'roc_auc': f"{results.get('draft_prediction', {}).get('roc_auc', 0):.1%}" if results.get('draft_prediction') else 'Not available'
                         }
                     }
                 }
@@ -326,8 +326,8 @@ def predict_duration():
 def get_sample_predictions():
     """Get predictions for sample matches from database"""
     try:
-        limit = request.args.get('limit', default=5, type=int)
-        limit = min(limit, 20)  # Max 20 samples
+        limit = request.args.get('limit', default=30, type=int)
+        limit = min(limit, 200)  # Max 200 samples for better statistical confidence
 
         prep = get_preprocessor()
 

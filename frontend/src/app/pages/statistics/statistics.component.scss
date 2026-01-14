@@ -170,7 +170,7 @@
 
 .charts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
   margin-bottom: 40px;
 
@@ -180,6 +180,13 @@
     border-radius: 8px;
     padding: 0;
     overflow: hidden;
+
+    // Center the third chart card
+    &:nth-child(3) {
+      grid-column: 1 / -1;
+      width: calc((100% - 24px) / 2);
+      margin: 0 auto;
+    }
   }
 }
 
@@ -289,6 +296,13 @@
 @media (max-width: 768px) {
   .charts-grid {
     grid-template-columns: 1fr;
+
+    .chart-card {
+      &:nth-child(3) {
+        max-width: 100%;
+        grid-column: 1;
+      }
+    }
   }
 
   .stats-table {

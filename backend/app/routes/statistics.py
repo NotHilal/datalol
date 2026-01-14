@@ -104,11 +104,15 @@ def get_overview_statistics():
         # Get top 10 champions ONLY (with limit parameter for efficiency)
         top_champions = match_model.aggregate_champion_stats(champion_name=None, limit=10)
 
+        # Total unique champion count (hardcoded based on League of Legends roster)
+        total_champions = 171
+
         return success_response({
             'overview': {
                 'totalMatches': total_matches,
                 'teamStatistics': team_stats,
-                'topChampions': top_champions
+                'topChampions': top_champions,
+                'totalChampions': total_champions
             }
         })
 
