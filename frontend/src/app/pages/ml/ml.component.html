@@ -809,8 +809,8 @@
 
                 <div class="stat-row">
                   <div class="stat-label">Damage Output</div>
-                  <div class="stat-blue">-</div>
-                  <div class="stat-red">-</div>
+                  <div class="stat-blue">{{ draftPrediction.features?.blue_team?.avg_damage?.toFixed(0) || '-' }}</div>
+                  <div class="stat-red">{{ draftPrediction.features?.red_team?.avg_damage?.toFixed(0) || '-' }}</div>
                   <div class="stat-diff" [class.blue-advantage]="draftPrediction.analysis.damage_advantage === 'Blue'" [class.red-advantage]="draftPrediction.analysis.damage_advantage === 'Red'">
                     {{ draftPrediction.analysis.damage_advantage }}
                   </div>
