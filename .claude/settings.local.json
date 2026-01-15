@@ -23,7 +23,10 @@
       "Bash(cmd.exe /c \"python --version\")",
       "Bash(cmd.exe /c \"python test_data_path.py\")",
       "Bash(py scriptsload_players_to_mongodb.py)",
-      "Bash(py scripts/load_players_to_mongodb.py)"
+      "Bash(py scripts/load_players_to_mongodb.py)",
+      "Bash(ls:*)",
+      "Bash(tree:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": []

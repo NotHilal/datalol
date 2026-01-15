@@ -110,11 +110,11 @@ def get_models_info():
                 },
                 {
                     'id': 'champion_clustering',
-                    'name': 'Champion Clustering',
-                    'type': 'Unsupervised Learning',
-                    'algorithm': 'K-Means',
+                    'name': 'Champion Role Classification',
+                    'type': 'Classification',
+                    'algorithm': 'Role-Based',
                     'clusters': results.get('champion_clustering', {}).get('n_clusters', 6),
-                    'description': 'Groups champions into distinct playstyle categories',
+                    'description': 'Classifies champions into 6 roles: Tank, Fighter, Assassin, Mage, ADC, Support',
                     'available': True
                 },
                 {

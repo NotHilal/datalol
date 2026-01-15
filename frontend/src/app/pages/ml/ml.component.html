@@ -28,7 +28,7 @@
       class="tab"
       [class.active]="selectedTab === 'clusters'"
       (click)="selectTab('clusters')">
-      Champion Clusters
+      Champion Roles
     </button>
     <button
       class="tab"
@@ -91,7 +91,7 @@
           </div>
           <div class="metric-main" *ngIf="model.clusters">
             <span class="metric-number">{{ model.clusters }}</span>
-            <span class="metric-text">archetypes</span>
+            <span class="metric-text">roles</span>
           </div>
         </div>
 
@@ -369,8 +369,8 @@
   <!-- Champion Clusters Tab -->
   <div *ngIf="selectedTab === 'clusters'" class="tab-content">
     <div *ngIf="championClusters" class="clusters-section">
-      <h2>Champion Archetypes</h2>
-      <p>{{ championClusters.total_champions }} champions analyzed and grouped into {{ championClusters.num_clusters }} distinct playstyle archetypes using machine learning</p>
+      <h2>Champion Roles</h2>
+      <p>{{ championClusters.total_champions }} champions classified into {{ championClusters.num_clusters }} distinct role categories based on game mechanics</p>
 
       <div class="clusters-grid">
         <div *ngFor="let cluster of championClusters.clusters" class="cluster-card">

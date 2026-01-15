@@ -1,140 +1,110 @@
 {
   "0": {
-    "size": 50,
-    "avg_winRate": 49.83302134944106,
-    "avg_kills": 6.200200961990179,
-    "avg_deaths": 5.437902979292855,
-    "avg_assists": 6.983004569905019,
-    "avg_kda": 2.432173009734929,
-    "avg_gold": 11889.014313767324,
-    "avg_damage": 23511.1266861458,
-    "avg_damageTaken": 21607.331125264674,
-    "avg_cs": 186.0661703670369,
-    "avg_visionScore": 18.310250942144872,
+    "archetype": "Tank",
+    "description": "Durable champions who absorb damage and protect their team",
+    "playstyle": "Initiate fights, soak damage for the team, and provide crowd control. These champions are the backbone of team fights.",
+    "size": 31,
+    "avg_winRate": 49.939076634721246,
+    "avg_kills": 3.811245246295639,
+    "avg_deaths": 5.495701514323847,
+    "avg_assists": 10.173521431853553,
+    "avg_kda": 2.552031022801562,
+    "top_champions": [
+      "Nautilus",
+      "Thresh",
+      "JarvanIV",
+      "Galio",
+      "Braum"
+    ]
+  },
+  "1": {
+    "archetype": "Fighter",
+    "description": "Balanced champions who excel in extended fights and duels",
+    "playstyle": "Engage in prolonged fights, split-push effectively, and duel opponents. These champions are versatile in side lanes and team fights.",
+    "size": 43,
+    "avg_winRate": 49.74509543382107,
+    "avg_kills": 6.019818886856908,
+    "avg_deaths": 5.707523135128506,
+    "avg_assists": 6.0768361474394,
+    "avg_kda": 2.141436145543009,
     "top_champions": [
       "Yunara",
+      "Viego",
+      "Sylas",
+      "Pantheon",
+      "Yasuo"
+    ]
+  },
+  "2": {
+    "archetype": "Assassin",
+    "description": "High-damage champions who excel at eliminating key targets quickly",
+    "playstyle": "Focus on securing kills, dealing massive burst damage, and creating picks. These champions thrive on catching enemies out of position.",
+    "size": 26,
+    "avg_winRate": 50.399305816234815,
+    "avg_kills": 7.622155763626443,
+    "avg_deaths": 5.6244703939074405,
+    "avg_assists": 6.761914965958275,
+    "avg_kda": 2.5755794186228984,
+    "top_champions": [
+      "Zed",
+      "Ekko",
+      "Diana",
+      "Akali",
+      "Kayn"
+    ]
+  },
+  "3": {
+    "archetype": "Mage",
+    "description": "Champions who deal magic damage and control the battlefield",
+    "playstyle": "Deal sustained or burst magic damage, control zones, and provide utility. These champions excel at range and area effects.",
+    "size": 37,
+    "avg_winRate": 50.2677067966046,
+    "avg_kills": 5.172136107405378,
+    "avg_deaths": 5.49392356575134,
+    "avg_assists": 8.186417809078279,
+    "avg_kda": 2.4488561573489434,
+    "top_champions": [
+      "Karma",
+      "Ahri",
+      "Lux",
+      "Aurora",
+      "Vladimir"
+    ]
+  },
+  "4": {
+    "archetype": "ADC",
+    "description": "Ranged champions who scale with gold and become powerful late-game threats",
+    "playstyle": "Focus on farming efficiently, scaling into late game, and dealing consistent physical damage. These champions need protection and time to reach their potential.",
+    "size": 22,
+    "avg_winRate": 49.76514861448492,
+    "avg_kills": 7.178153723388914,
+    "avg_deaths": 5.918918442348917,
+    "avg_assists": 6.56624547995039,
+    "avg_kda": 2.3364076478443505,
+    "top_champions": [
       "Kaisa",
       "Jhin",
       "Lucian",
-      "Jinx"
-    ],
-    "archetype": "Battle Mages & Bruisers",
-    "description": "Durable damage dealers who thrive in extended combat",
-    "playstyle": "Deal sustained damage while surviving in fights. These champions combine durability with damage output."
+      "Jinx",
+      "Smolder"
+    ]
   },
-  "1": {
-    "size": 21,
-    "avg_winRate": 50.36391036091649,
-    "avg_kills": 1.7467824739363618,
-    "avg_deaths": 5.15930638203265,
-    "avg_assists": 14.290217453392943,
-    "avg_kda": 3.170083213003118,
-    "avg_gold": 8109.574866765384,
-    "avg_damage": 9180.81105497897,
-    "avg_damageTaken": 19258.71788353038,
-    "avg_cs": 31.359374047647954,
-    "avg_visionScore": 57.92680906522378,
+  "5": {
+    "archetype": "Support",
+    "description": "Champions who protect and empower allies through healing, shielding, and utility",
+    "playstyle": "Provide vision, peel for carries, and enable teammates. These champions excel at keeping their team alive and creating opportunities.",
+    "size": 12,
+    "avg_winRate": 50.14884601551384,
+    "avg_kills": 1.819206627306846,
+    "avg_deaths": 4.881544717924439,
+    "avg_assists": 14.210196080421788,
+    "avg_kda": 3.3355847294704444,
     "top_champions": [
       "Nami",
       "Lulu",
-      "Thresh",
-      "Karma",
-      "Milio"
-    ],
-    "archetype": "Enchanter Supports (Type A)",
-    "description": "Champions who protect and empower allies through healing, shielding, and buffs - Type A variant",
-    "playstyle": "Provide vision, peel for carries, and enable teammates with buffs/shields. These champions excel at keeping their team alive."
-  },
-  "2": {
-    "size": 33,
-    "avg_winRate": 49.934470134768624,
-    "avg_kills": 6.528423906250342,
-    "avg_deaths": 5.352809425310941,
-    "avg_assists": 8.062478999679973,
-    "avg_kda": 2.7365717055124676,
-    "avg_gold": 11803.320548272093,
-    "avg_damage": 19312.346667305374,
-    "avg_damageTaken": 35172.973598182034,
-    "avg_cs": 49.21856575452789,
-    "avg_visionScore": 22.159714149862396,
-    "top_champions": [
-      "Viego",
-      "Pantheon",
-      "JarvanIV",
-      "Ekko",
-      "Volibear"
-    ],
-    "archetype": "Team Fight Controllers",
-    "description": "Champions who excel in coordinated team fights with area damage and CC",
-    "playstyle": "Maximize team fight presence, deal area damage, and create opportunities. These champions shine in 5v5 engagements."
-  },
-  "3": {
-    "size": 16,
-    "avg_winRate": 50.00047084412978,
-    "avg_kills": 4.367436137495428,
-    "avg_deaths": 5.991510246547765,
-    "avg_assists": 10.343402998689946,
-    "avg_kda": 2.465613500835859,
-    "avg_gold": 9962.023440519977,
-    "avg_damage": 18336.744387991923,
-    "avg_damageTaken": 25403.262422804237,
-    "avg_cs": 70.02224277989893,
-    "avg_visionScore": 44.45743089230746,
-    "top_champions": [
-      "Nautilus",
-      "Lux",
-      "Senna",
-      "Pyke",
-      "Poppy"
-    ],
-    "archetype": "Enchanter Supports (Type B)",
-    "description": "Champions who protect and empower allies through healing, shielding, and buffs - Type B variant",
-    "playstyle": "Provide vision, peel for carries, and enable teammates with buffs/shields. These champions excel at keeping their team alive."
-  },
-  "4": {
-    "size": 19,
-    "avg_winRate": 48.78152048755705,
-    "avg_kills": 5.067087791478608,
-    "avg_deaths": 5.477173411793418,
-    "avg_assists": 5.424174000383547,
-    "avg_kda": 1.9327238538994127,
-    "avg_gold": 11622.783104856046,
-    "avg_damage": 22071.84166359252,
-    "avg_damageTaken": 34615.31951889964,
-    "avg_cs": 183.75148486186018,
-    "avg_visionScore": 16.11789212847033,
-    "top_champions": [
-      "Aatrox",
-      "Yone",
-      "Vladimir",
-      "Ambessa",
-      "Renekton"
-    ],
-    "archetype": "Versatile All-Rounders (Bruiser-Style)",
-    "description": "Flexible champions who can adapt to multiple roles and playstyles - Bruiser-Style variant",
-    "playstyle": "Adapt to team needs, fill gaps in composition, and provide balanced contributions. These champions can be played in various ways."
-  },
-  "5": {
-    "size": 32,
-    "avg_winRate": 50.93968379573907,
-    "avg_kills": 6.812863963877575,
-    "avg_deaths": 6.165082296384342,
-    "avg_assists": 5.828430134683362,
-    "avg_kda": 2.0480190686980992,
-    "avg_gold": 12156.030548864937,
-    "avg_damage": 23391.773890267254,
-    "avg_damageTaken": 28041.019682219645,
-    "avg_cs": 158.34667996589394,
-    "avg_visionScore": 17.142654340985153,
-    "top_champions": [
-      "Sylas",
-      "Yasuo",
-      "Aphelios",
-      "Jax",
-      "Diana"
-    ],
-    "archetype": "Versatile All-Rounders (Glass Cannon)",
-    "description": "Flexible champions who can adapt to multiple roles and playstyles - Glass Cannon variant",
-    "playstyle": "Adapt to team needs, fill gaps in composition, and provide balanced contributions. These champions can be played in various ways."
+      "Milio",
+      "Sona",
+      "Senna"
+    ]
   }
 }

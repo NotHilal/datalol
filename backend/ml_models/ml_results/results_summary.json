@@ -1,0 +1,22 @@
+{
+  "champion_clustering": {
+    "n_clusters": 6,
+    "cluster_sizes": {
+      "1": 43,
+      "3": 37,
+      "0": 31,
+      "2": 26,
+      "4": 22,
+      "5": 12
+    },
+    "role_based": true,
+    "roles": [
+      "Tank",
+      "Fighter",
+      "Assassin",
+      "Mage",
+      "ADC",
+      "Support"
+    ]
+  }
+}
